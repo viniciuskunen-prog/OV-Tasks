@@ -1,6 +1,6 @@
 # M1 — Native menu bar visual prototype
 
-**Status: source implemented, native compilation and visual validation pending.**
+**Status: compiled and launched successfully on a contributor Mac (2026-10-22); dark-mode scenario screenshots reviewed. Final M1 approval and the remaining smoke/accessibility tests are pending.**
 
 M1 is intentionally a **design/interaction preview**. All counter values, task titles, events, timestamps and provider badges are generated from synthetic in-memory fixtures. There are no API calls, account connections, background sync, macOS notification scheduling, database files or saved credentials. A future milestone will implement those systems.
 
@@ -10,15 +10,15 @@ Requirements: Apple Silicon or Intel Mac running macOS 14+ and Apple's Xcode Com
 
 From a clean checkout of this branch:
 
-\`\`\`zsh
+```zsh
 cd OV-Tasks
 zsh ./build.sh
 open ./build/OVTasks.app
-\`\`\`
+```
 
-The local build uses \`xcrun swiftc\`, assembles \`build/OVTasks.app\` in the checkout and signs it **ad hoc for local testing** if \`codesign\` is available. It **does not** install into \`/Applications\`, require a developer team, run GitHub Actions, create a GitHub Release or notarize a distributable binary.
+The local build uses `xcrun swiftc`, assembles `build/OVTasks.app` in the checkout and signs it **ad hoc for local testing** if `codesign` is available. It **does not** install into `/Applications`, require a developer team, run GitHub Actions, create a GitHub Release or notarize a distributable binary.
 
-\`build/\` is ignored by Git. The app is labeled \`OV Tasks Preview\`, separate from a future stable app identity.
+`build/` is ignored by Git. The app is labeled `OV Tasks Preview`, separate from a future stable app identity.
 
 ## Inspect the popover
 
@@ -33,6 +33,25 @@ The local build uses \`xcrun swiftc\`, assembles \`build/OVTasks.app\` in the ch
 
 **UI strings are currently PT-BR.** English docs describe the behavior for contributors; localization is a future task.
 
+## Evidence from first native Mac validation — 2026-10-22
+
+The contributor cloned the `feat/m1-swiftui-menu-prototype` branch, executed `zsh ./build.sh`, and opened `build/OVTasks.app`. Shared terminal output showed:
+
+```text
+Building OV Tasks M1 (synthetic-data preview)...
+build/OVTasks.app/Contents/Info.plist: OK
+build/OVTasks.app: replacing existing signature
+Local preview created at: build/OVTasks.app
+```
+
+This confirms **local Swift compilation and app bundle generation**, but not release signing or notarization. Eight user-supplied dark-mode screenshots show the menu bar app and popover in the Overview/All, Important filter, scenario-menu, Empty, Offline, Reconnect and Loading views, plus the macOS Settings scene. On those screenshots, the four cards, links, filter controls and empty-state message are legible without an obvious clipped heading.
+
+**Not yet evidenced:** appearance in light mode; VoiceOver/keyboard navigation; demo-link alert actually opening; close/reopen persistence; Quit; large accessibility text sizes; package signing/notarization.
+
+**Minor visual improvements identified:** the built-in relative date style can show unnecessary seconds (e.g. “12 min e 32 seg”); consider compact minute/hour labels. The “Concluídas” card should clarify that its period is seven days. Explore slight vertical density reduction only after confirming it preserves legibility and scroll affordance.
+
+The source and checks listed above do **not** prove working provider integrations or notification delivery.
+
 ## Visual QA requested
 
 Capture screenshots for each scenario in dark and light mode (do not include personal task data, since none are used). Check:
@@ -46,24 +65,24 @@ Capture screenshots for each scenario in dark and light mode (do not include per
 
 If compiler diagnostics occur, record the full error and output of:
 
-\`\`\`zsh
+```zsh
 sw_vers -productVersion
 xcrun swiftc --version
 xcode-select -p
-\`\`\`
+```
 
 Do not claim M1 was compiled or passed until the real Mac build and smoke results are recorded.
 
 ## Code layout
 
-\`\`\`text
+```text
 Sources/OVTasksApp/
   OVTasksApp.swift                  # SwiftUI MenuBarExtra and Settings scenes
   Preview/PreviewData.swift        # synthetic data and scenarios
   Views/DashboardView.swift        # dashboard, feed and clickable simulated links
   Settings/PreviewSettingsView.swift # state switches and planned integrations
 build.sh                            # local .app bundle generator
-\`\`\`
+```
 
 ## Not included (deliberate)
 
