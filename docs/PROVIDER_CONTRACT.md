@@ -1,59 +1,46 @@
-# Provider adapter contract (design)
+# Provider adapter contract — v0.1
 
-**Not implemented.** Version this contract after the first two real adapters demonstrate adequate generality.
+**Status:** `ProviderAdapter`, `ProviderPage`, `ProviderCapabilities`, `ProviderSyncError` and `SnapshotIngestor` implemented in source on the M2.5 branch. **Not yet verified on a Mac.** ClickUp, Trello and NanoTask real adapters and authorization are still planned.
 
-## Goals
-A provider supplies just enough information for dashboard metrics, feed events and links. A provider does not own UI presentation, notification permissions or the global cache. All connector operations are asynchronous and cancelable.
+## Boundary
 
-## Proposed Swift sketch
+Each provider supplies read-only, already normalized task pages for an **authorized, explicitly watched scope**. It never controls the UI or notifications, and must never hold another provider's credentials. The app's authentication layer will be separate, with access tokens in the macOS Keychain. No remote service or user token is present in M2.5.
+
 ```swift
-struct ProviderCapabilities: Sendable {
-    let supportsComments: Bool
-    let supportsAssignments: Bool
-    let supportsCompletionTimestamp: Bool
-    let supportsIncrementalSync: Bool
-    let supportsEvents: Bool
-}
-
-struct WatchedScope: Sendable, Hashable {
-    let providerID: String
-    let accountID: String
-    let sourceScopeID: String
-}
-
-struct SnapshotPage: Sendable {
-    let tasks: [TaskSummary]
-    let nextPageCursor: String?
-    let isComplete: Bool
-}
-
-protocol ProviderAdapter: Sendable {
-    var id: String { get }
+public protocol ProviderAdapter: Sendable {
+    var providerID: String { get }
     var capabilities: ProviderCapabilities { get }
+    func fetchPage(for scope: WatchedScope, cursor: String?) async throws -> ProviderPage
+}
 
-    func availableScopes(accountID: String) async throws -> [WatchedScope]
-    func fetchPage(
-        scope: WatchedScope,
-        cursor: String?,
-        since: Date?
-    ) async throws -> SnapshotPage
-    func validatedTaskURL(for task: TaskSummary) -> URL?
+public struct ProviderPage: Sendable {
+    public let tasks: [TaskSummary]
+    public let nextCursor: String?
 }
 ```
-`TaskSummary` will be the pure domain type specified in [DATA_MODEL](DATA_MODEL.md); do not compile this sketch as-is without defining it. Authentication is owned by a separate per-provider `AuthorizationProvider` that uses the Keychain, not an adapter storing plaintext secrets.
 
-## Adapter quality bar
-1. Fetch only explicitly watched resources, honoring account authorization.
-2. Cap page sizes, implement documented pagination, and never silently return only the first page.
-3. Preserve source IDs and timestamps. Normalize status via user-configurable mapping where necessary.
-4. Explicitly declare absent/unsupported capabilities.
-5. Validate task links; do not accept arbitrary file/javascript URL schemes.
-6. Consistently classify `unauthorized`, `rateLimited(retryAfter)`, `transient`, `notFound`, `malformedPayload`; do not treat all failures as “0 tasks.”
-7. Ship synthetic fixtures that cover pagination, empty scopes, custom statuses, inaccessible resources and date-only deadlines.
-8. Provide a README and integration test instructions; no real API tokens or customer tasks in fixtures.
+`ProviderCapabilities` declares support for comments, assignments, reliable completion timestamps, incremental synchronization, and source events. It documents capabilities rather than silently manufacturing missing fields.
 
-## Extensibility roadmap
-Built-in adapters compiled with the app in v1; new providers added via reviewed PR and feature flags. A later declarative JSON/REST mapping system would need schema validation, allowlisted HTTPS domains, quota controls, no eval/shell/dynamic downloaded code and secure per-provider secret handling. Custom webhooks require their own authenticated receiver or relay.
+## Correct sync semantics
 
-## Stable identifiers
-Use `providerID/accountID/scopeID/taskID` instead of task title or task URL for joins and deduplication. Scope removal must not leak stale tasks as newly assigned.
+1. Validate that the adapter provider matches the watched scope; reject empty scope identifiers.
+2. Query page 1, then follow `nextCursor` until `nil`. Never commit page 1 as if it were a complete board.
+3. Validate every task belongs to the watched scope and has a stable identity. Reject duplicate identities and repeated pagination cursors.
+4. Bound memory/time by `maxPages` (default 100) and `maxTasks` (default 25,000), with cancellation checks between pages.
+5. On **fully successful** paging, call `SQLiteSnapshotStore.applyCompleteSnapshot` once. Its transaction updates the snapshot and corresponding change events together.
+6. A thrown API error, cancellation, invalid page, repeated cursor or exceeded bound leaves the **last good snapshot** untouched and does not invent task deletions.
+7. A first successful scope snapshot is a silent baseline, not a burst of notifications.
+
+The ingestor is a **library function**, not an automatic polling service. Network transport, authorization, rate-limit backoff, provider-specific URL host allowlists and background timers remain to be implemented.
+
+## Fake adapters and tests
+
+The branch includes `Tests/M25StandaloneSmoke.swift`, which creates a synthetic two-page adapter and deliberately fails on its second page or repeats a cursor. No external URLs are fetched, no real credentials exist and tests operate on disposable SQLite files.
+
+To run, follow [M2.5 preview verification](M25_PREVIEW_BRIDGE.md). Once the local SwiftPM manifest issue is resolved, add equivalent XCTest contract tests to the package suite.
+
+## Extensibility decisions
+
+Version this interface when two real adapters have exercised it. Preserve separate authentication and restrict future community extensions to reviewed, compiled adapters; do not execute arbitrary downloaded scripts, plugins or untrusted declarative URLs by default. A future REST adapter wizard must add HTTPS/domain validation, credential isolation, SSRF prevention and paginated fixture testing.
+
+Stable task IDs are provider/account/workspace/task, with scope ownership validated separately. A task URL is a presentation field, not a key. Real navigation requires a verified HTTPS URL and provider-specific destination policy.
