@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status (2026-10-22):** M1/M2/M2.5 development milestones integrated; 13 native M2 XCTest tests and M2.5 simulated macOS UI/adapter smoke previously passed. A separate M3A branch now contains **uncompiled, untested** ClickUp API read-only foundation and Keychain storage. **No real provider connection in the app** and no stable release.
+> **Status (2026-10-22):** M1/M2/M2.5 development milestones integrated; 13 native M2 XCTest tests and M2.5 simulated macOS UI/adapter smoke previously passed. A separate M3A development branch has passed **17 native XCTest cases** for its ClickUp read-only foundation, including previous M2 tests; Keychain integration has not been tested in a signed app. **No real provider connection in the app** and no stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
