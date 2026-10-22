@@ -1,12 +1,12 @@
 # M2.5 — bridge between M2 core and macOS preview
 
-**Status (2026-10-22): direct-swiftc M2.5 integration smoke PASS, native macOS bundle compiled and launched, dark-mode Overview/Important screenshots reviewed successfully. M2 parent SwiftPM/XCTest suite remains blocked; this stacked PR is not ready to merge into main.**
+**Status (2026-10-22): direct-swiftc M2.5 integration smoke PASS, native macOS bundle compiled and launched, dark-mode Overview/Important screenshots reviewed successfully. Parent M2 PR #5 has now passed native XCTest (13/13, zero failures) and was merged into `main`. M2.5 PR #6 is retargeted to `main`, pending branch reconciliation and its own merge.**
 
 ## Why this milestone exists
 
 M1 proved the menu bar UX with hard-coded fixture numbers/events. M2 introduced normalized task models, scoped metrics, change detection and SQLite. M2.5 connects them **without presenting test data as a connected account**. It also establishes the interface real provider adapters will implement, without writing Trello/ClickUp/NanoTask HTTP calls yet.
 
-M2.5 **depends on M2**. The branch `feat/m25-preview-bridge` was created from `feat/m2-domain-store`; its eventual PR targets the M2 branch, not `main`. Do not merge the child PR before the M2 parent is ready, and do not accidentally merge unvalidated parent code.
+M2.5 **depends on M2**. It originated from `feat/m2-domain-store`; its parent PR #5 passed 13 native XCTest checks and was merged to `main` on 2026-10-22. The child PR #6 was retargeted to `main` and now requires resolving its branch divergence caused by later M2 documentation-only commits. Its source changes are scoped to the synthetic core/UI bridge and provider contract.
 
 ## Implemented in source
 
@@ -86,4 +86,4 @@ Initially, `open` reused the old running **M1** process; its screenshots showed 
 
 ## Acceptance
 
-The direct runner, native app build and primary dark-mode UI/filter validation have been observed and passed. **Keep this stacked PR draft** because its M2 parent #5 has not met the full SwiftPM/XCTest quality gate; PR #6 must not bypass that dependency. Repeat untested M2.5 scenarios and accessiblity checks before any public release. No GitHub Actions used.
+The direct runner, native app build and primary dark-mode UI/filter validation passed. The parent M2 #5 also passed its native XCTest gate and was merged to `main`. **Keep PR #6 draft until main is integrated into its branch, the diff reconciled and reviewed.** Additional UI scenario, light-theme and accessibility checks (#3) remain mandatory before any public release. No GitHub Actions used.
