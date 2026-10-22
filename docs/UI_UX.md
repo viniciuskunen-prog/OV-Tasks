@@ -1,6 +1,6 @@
 # Interface and UX specification
 
-**Status: design proposal. Screenshots and native layout are not yet validated.**
+**Status: UI proposal implemented as M1 SwiftUI prototype source; native build and screenshots not yet validated.**
 
 ## Layout
 - macOS menu bar monochrome icon, readable in light/dark mode; optional small urgent/unread marker that does not rely only on color.
@@ -25,9 +25,13 @@ Keyboard navigation; focus ring; VoiceOver labels; reduced motion; dynamic text 
 ## Design language
 Minimal utility-oriented macOS UI. Prefer native materials, SF Symbols, restrained status use, spacing and typography consistent with macOS. No requirement to duplicate task platform colors or GimbalBar layout. User visual approval is a gate before connecting real accounts.
 
+## Current prototype
+
+Implemented in source code on the M1 branch: menu bar entry, compact mock dashboard, synthetic feed, All/Important filter, 5 simulated modes and a Settings scene. The task-link buttons show an explicit demo alert instead of opening a nonexistent task. See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for build and test instructions.
+
 ## Definition of prototype (M1)
 - SwiftUI menu app launches and closes popover without terminating app.
 - All dashboard, feed and empty/offline/error states rendered from **synthetic fixtures only**.
 - Screenshots in both system appearances and with long titles/dynamic text.
-- Link buttons shown as clickable controls pointing to a safe fixture URL (not personal task data).
+- Link buttons shown as clickable controls that open an explicit **demo-only alert** (no task URL until adapters exist).
 - No provider tokens, network sync or notifications required in M1.
