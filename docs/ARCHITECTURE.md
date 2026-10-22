@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status: M1 app shell validated; M2 core passed a five-group direct Swift runtime smoke, with XCTest blocked by local SwiftPM. M2.5 branch adds an unvalidated synthetic bridge and typed paging contract. No live providers or notifications exist.**
+**Status (2026-10-22): M1 app shell validated; M2 core passed native XCTest 13/13, zero failures, and is merged in `main`. M2.5 synthetic SwiftUI/SQLite bridge and typed paging contract passed local Mac integration smoke and dark-mode visual QA but await PR #6 reconciliation. No live providers or notifications exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
