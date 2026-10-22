@@ -97,28 +97,37 @@ xcrun swiftc -parse-as-library -typecheck -module-name OVTasksCore \
 
 This type-check is **not equivalent to running `swift test`** and provides no XCTest evidence. If developer tools need repair, use a compatible official Apple toolchain / CLT update process only after checking the installed versions and macOS release. Do not delete Command Line Tools blindly, disable security mechanisms, or introduce hosted GitHub Actions as a workaround.
 
-## SwiftPM manifest compatibility experiment — 2026-10-22
+## SwiftPM manifest experiment outcome and isolated diagnosis — 2026-10-22
 
-An isolated change on PR #5 updates the manifest from `// swift-tools-version: 5.9` to `6.0` and explicitly sets `swiftLanguageModes: [.v5]`. Swift PackageDescription 6 introduced the **new Package initializer** using `swiftLanguageModes` rather than the legacy `swiftLanguageVersions` parameter. The originally failing linker symbol references the legacy initializer. By forcing the new API, this experiment may avoid the missing symbol while keeping source compilation in Swift 5 language mode.
+An attempted compatibility change to `// swift-tools-version: 6.0` plus `swiftLanguageModes: [.v5]` **failed** on the contributor's Command Line Tools. After checking out the updated parent M2 branch, the real `swift package dump-package` output was:
 
-**Not yet verified on macOS**. A separate external Swift Forums report of a similar undefined symbol even with newer tools versions means this is not guaranteed to fix an inconsistent Command Line Tools installation. The change does not modify any Swift source or the native `build.sh`.
+```text
+Package.swift:24:25: error: extra argument 'swiftLanguageModes' in call
+Package.swift:24:27: error: reference to member 'v5' cannot be resolved without a contextual type
+error: invalid manifests
+```
 
-Run from the **parent M2 branch**, not M2.5:
+No XCTest code was compiled. Although current PackageDescription documentation describes `swiftLanguageModes`, the local SwiftPM 6.4-dev/Command Line Tools manifest interface did not recognize it. The experimental manifest edit was **reverted** to the original portable tools version 5.9. Its older manifest still fails to link a `PackageDescription.Package` initializer on this Mac.
+
+To distinguish a broken toolchain from a particular initializer ABI mismatch, the parent M2 branch now includes `diagnose-swiftpm.sh`. It creates three **disposable, minimal** packages in `${TMPDIR}`: a Swift Tools 5.9 minimal package, an explicitly older 5.9 constructor overload, and a Swift Tools 6.0 minimal package. It runs `swift package dump-package` on each and summarizes independent failures. The script does not alter the OV Tasks source tree, `xcode-select`, any global developer tools or the installed app. It also reports whether a native `xctest` runner is available.
 
 ```zsh
 cd ~/Projects/OV-Tasks
 git fetch origin
 git switch feat/m2-domain-store
 git pull --ff-only
-swift package dump-package >/dev/null && swift test --jobs 2
+zsh ./diagnose-swiftpm.sh
 ```
 
-- If `dump-package` still reports `PackageDescription.Package.__allocating_init`, capture that output; do not reinstall toolchains without further diagnosis. The specific manifest experiment failed.
-- If `dump-package` succeeds but tests fail in Swift source or XCTest assertions, those are **new concrete** failures to fix separately.
-- If `swift test` passes, record the exact test total and exit status, then run regression scripts again as appropriate before reviewing PR #5.
-- No GitHub Actions or Xcode reinstall are needed for this experiment. `--jobs 2` limits compiler parallelism.
+**Diagnostic has NOT yet run** on the contributor Mac. Interpret its outcomes:
 
-References: Swift proposal [SE-0441](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0441-formalize-language-mode-terminology.md) and SwiftPM [changelog](https://github.com/swiftlang/swift-package-manager/blob/main/CHANGELOG.md).
+- If **all minimal packages fail**, the issue is demonstrably independent of OV Tasks and strongly implicates the local CLT SwiftPM/PackageDescription installation.
+- If the **explicit legacy overload works** but the minimal modern form fails, we can investigate a *targeted* portable overload choice without reinstalling tools.
+- If **minimal packages pass**, the project manifest or build configuration needs further reduction/inspection.
+
+Even when the manifest issue is solved, Command Line Tools without full Xcode may lack the native `xctest` executable; that is a **separate** potential limitation, not proof from these logs. Apple recommends updating compatible Command Line Tools through System Settings → Software Update or official developer downloads before considering destructive uninstallation. Do not uninstall system tools speculatively.
+
+The M2 direct runtime smoke and M2.5 native UI demonstration already passed; these remain valid evidence for their tested scenarios but do not imply XCTest passed.
 
 ## Alternative direct-`swiftc` executable smoke test (CLT-only)
 
