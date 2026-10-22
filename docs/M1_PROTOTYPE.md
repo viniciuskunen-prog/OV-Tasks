@@ -54,11 +54,11 @@ The contributor supplied light-mode screenshots showing readable metric cards, e
 - **Demo event links:** confirmation dialogs open for ClickUp, Trello and NanoTask sample tasks. Real navigation is intentionally absent from M1.
 - **Scenario persistence:** the selected Offline scenario remains after closing and reopening the popover.
 - **Quit:** exits the application as expected.
-- **Keyboard navigation:** contributor explicitly reports **not working**. Root cause not yet established; macOS Keyboard Navigation / Full Keyboard Access setting and SwiftUI focus behavior both need investigation. Tracked in [issue #3](../issues/3). **Deferred for M1 only; fix and VoiceOver validation are required before a public stable release.**
+- **Keyboard navigation:** contributor explicitly reports **not working**. Root cause not yet established; macOS Keyboard Navigation / Full Keyboard Access setting and SwiftUI focus behavior both need investigation. Tracked in [issue #3](https://github.com/viniciuskunen-prog/OV-Tasks/issues/3). **Deferred for M1 only; fix and VoiceOver validation are required before a public stable release.**
 
 **Still not verified:** VoiceOver focus/announcements, large accessibility text sizes, real links, real notifications, any provider APIs, installation on a second clean Mac, developer signing and notarization.
 
-UI polish remains optional after this M1 baseline: use concise elapsed-time labels (no unnecessary seconds), clarify the seven-day window of the Completed card, and review vertical density only if readability is maintained. See [issue #4](../issues/4).
+UI polish remains optional after this M1 baseline: use concise elapsed-time labels (no unnecessary seconds), clarify the seven-day window of the Completed card, and review vertical density only if readability is maintained. See [issue #4](https://github.com/viniciuskunen-prog/OV-Tasks/issues/4).
 
 The source and checks listed above do **not** prove working provider integrations or notification delivery.
 
