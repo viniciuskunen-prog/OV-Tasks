@@ -100,7 +100,8 @@ final class StoreTests: XCTestCase {
         let store = try SQLiteSnapshotStore(databaseURL: url)
         let taskA = fixtureTask(id: "a", scope: a)
         let taskB = fixtureTask(id: "b", scope: b)
-        XCTAssertNil(try await store.snapshot(for: a))
+        let beforeAnySync = try await store.snapshot(for: a)
+        XCTAssertNil(beforeAnySync)
         try await store.applyCompleteSnapshot(scope: a, tasks: [taskA], detectedAt: now)
         try await store.applyCompleteSnapshot(scope: b, tasks: [taskB], detectedAt: now)
         try await store.applyCompleteSnapshot(scope: a, tasks: [], detectedAt: now.addingTimeInterval(1))
@@ -110,7 +111,9 @@ final class StoreTests: XCTestCase {
         XCTAssertEqual(other, [taskB])
 
         try await store.removeAccount(providerID: "trello", accountID: "account-a")
-        XCTAssertNil(try await store.snapshot(for: a))
-        XCTAssertEqual(try await store.snapshot(for: b), [taskB])
+        let removedSnapshot = try await store.snapshot(for: a)
+        let preservedOtherAccount = try await store.snapshot(for: b)
+        XCTAssertNil(removedSnapshot)
+        XCTAssertEqual(preservedOtherAccount, [taskB])
     }
 }
