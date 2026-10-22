@@ -297,9 +297,10 @@ final class ClickUpConnectionStore: ObservableObject {
             // present in the selected cached snapshots. Unselected data is excluded.
             let scoped = rawEvents.filter { allowed.contains($0.taskIdentity) }
             let mapped = scoped.compactMap(PreviewEvent.from)
-            let urls = Dictionary(uniqueKeysWithValues: scoped.compactMap { event in
-                linkByIdentity[event.taskIdentity].map { (event.id, $0) }
-            })
+            var urls: [String: URL] = [:]
+            for event in scoped {
+                if let url = linkByIdentity[event.taskIdentity] { urls[event.id] = url }
+            }
             guard connection?.accountID == saved.accountID,
                   connection?.workspaceID == saved.workspaceID,
                   connection?.spaceID == saved.spaceID,
@@ -334,7 +335,7 @@ final class ClickUpConnectionStore: ObservableObject {
             var failures = 0
             var successes = 0
             for list in saved.lists {
-                if Task.isCancelled { throw CancellationError() }
+                try Task.checkCancellation()
                 let adapter = ClickUpListAdapter(
                     client: client, credentials: credentials,
                     accountID: saved.accountID, workspaceID: saved.workspaceID,
