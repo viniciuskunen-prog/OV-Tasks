@@ -93,7 +93,7 @@ struct PreviewEvent: Identifiable {
         PreviewEvent(
             id: "clickup-status-1",
             typeLabel: "Status alterado",
-            taskName: "Banner — Creatina",
+            taskName: "Revisar apresentação visual",
             summary: "Em andamento → Concluída",
             provider: .clickup,
             systemImage: "checkmark.circle",
@@ -103,7 +103,7 @@ struct PreviewEvent: Identifiable {
         PreviewEvent(
             id: "trello-due-1",
             typeLabel: "Prazo vencendo",
-            taskName: "Programação de sexta-feira",
+            taskName: "Preparar peças de divulgação",
             summary: "Vence em 2 horas",
             provider: .trello,
             systemImage: "calendar.badge.exclamationmark",
@@ -113,7 +113,7 @@ struct PreviewEvent: Identifiable {
         PreviewEvent(
             id: "nanotask-status-1",
             typeLabel: "Nova etapa",
-            taskName: "Revisão de testes de integração",
+            taskName: "Revisar plano de testes",
             summary: "Em andamento → Em revisão",
             provider: .nanoTask,
             systemImage: "arrow.triangle.branch",
@@ -123,7 +123,7 @@ struct PreviewEvent: Identifiable {
         PreviewEvent(
             id: "trello-overdue-1",
             typeLabel: "Prazo vencido",
-            taskName: "Atualizar campanha de lançamento",
+            taskName: "Finalizar revisão de conteúdo",
             summary: "Venceu ontem",
             provider: .trello,
             systemImage: "exclamationmark.circle",
@@ -133,7 +133,7 @@ struct PreviewEvent: Identifiable {
         PreviewEvent(
             id: "clickup-comment-1",
             typeLabel: "Novo comentário",
-            taskName: "Revisão da página institucional",
+            taskName: "Conferir documentação do projeto",
             summary: "Há uma nova atualização na tarefa",
             provider: .clickup,
             systemImage: "bubble.left",
