@@ -1,12 +1,12 @@
 # M2.5 — bridge between M2 core and macOS preview
 
-**Status (2026-10-22): direct-swiftc M2.5 integration smoke PASS, native macOS bundle compiled and launched, dark-mode Overview/Important screenshots reviewed successfully. Parent M2 PR #5 has now passed native XCTest (13/13, zero failures) and was merged into `main`. M2.5 PR #6 was retargeted and synchronized with `main` at branch head `307bf0b` on 2026-10-22; its final review/merge is separate.**
+**Status (2026-10-22): direct-swiftc M2.5 integration smoke PASS, native macOS bundle compiled and launched, dark-mode Overview/Important screenshots reviewed successfully. Parent M2 PR #5 has now passed native XCTest (13/13, zero failures) and was merged into `main`. M2.5 PR #6 was synchronized with `main`, reviewed, and **merged** as a development milestone at commit `b7c545ad7b4543e5793ac72faad1a37f9b6248d7` on 2026-10-22.**
 
 ## Why this milestone exists
 
 M1 proved the menu bar UX with hard-coded fixture numbers/events. M2 introduced normalized task models, scoped metrics, change detection and SQLite. M2.5 connects them **without presenting test data as a connected account**. It also establishes the interface real provider adapters will implement, without writing Trello/ClickUp/NanoTask HTTP calls yet.
 
-M2.5 **depends on M2**. It originated from `feat/m2-domain-store`; its parent PR #5 passed 13 native XCTest checks and was merged to `main` on 2026-10-22. The child PR #6 was retargeted to `main`, and the contributor merged `origin/main` into `feat/m25-preview-bridge` using the Git `ort` strategy (commit `307bf0b`). GitHub comparison subsequently confirmed **ahead, behind 0 and a clean merge state**, with 15 M2.5-related files changed. No M2 core implementation was replaced.
+M2.5 **depends on M2**. It originated from `feat/m2-domain-store`; its parent PR #5 passed 13 native XCTest checks and was merged to `main` on 2026-10-22. The child PR #6 was retargeted to `main`, and the contributor merged `origin/main` into `feat/m25-preview-bridge` using the Git `ort` strategy (commit `307bf0b`). GitHub comparison confirmed a **clean merge state**, behind 0 and only 15 M2.5-related files changed. PR #6 was subsequently integrated into `main` (merge commit `b7c545ad7b4543e5793ac72faad1a37f9b6248d7`). No M2 core implementation was replaced.
 
 ## Implemented in source
 
@@ -86,4 +86,4 @@ Initially, `open` reused the old running **M1** process; its screenshots showed 
 
 ## Acceptance
 
-The direct runner, native app build and primary dark-mode UI/filter validation passed. The parent M2 #5 also passed its native XCTest gate and was merged to `main`. PR #6 has been synchronized with `main` and its final diff is under review. Keep the distinction between milestone acceptance and a public release. Additional UI scenario, light-theme and accessibility checks (#3) remain mandatory before any public release. No GitHub Actions used.
+The direct runner, native app build and primary dark-mode UI/filter validation passed. The parent M2 #5 also passed its native XCTest gate and was merged to `main`. PR #6 has been merged into `main` after final diff review. This accepts the **synthetic integration milestone**, not a public release. Additional UI scenario, light-theme and accessibility checks (#3) remain mandatory before any public release. No GitHub Actions used.
