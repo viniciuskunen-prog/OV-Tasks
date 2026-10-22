@@ -1,11 +1,11 @@
 # Implementation roadmap
 
-**Status:** M0 documentation completed; M1 SwiftUI source prepared but awaiting physical Mac compilation, visual approval and smoke tests. Later milestones remain planned. No time estimates are implied.
+**Status:** M0 documentation completed; M1 SwiftUI preview source built and user-reviewed on a physical Mac in light and dark appearances (2026-10-22). Keyboard accessibility is a known deferred debt (#3) and is required before stable v1. Later milestones remain planned. No time estimates are implied.
 
 | Milestone | Goal | Acceptance / exit criteria |
 | --- | --- | --- |
 | M0 — Documentation baseline | Public repo, developer docs and governance | README, architecture, provider contract, UI spec, security, contributing guide, no secrets |
-| M1 — Native shell (source prepared, QA pending) | SwiftUI menu bar app with mocked states | Confirm local build; opens menu, popover stays compact, light/dark, Settings, keyboard/VoiceOver, synthetic fixtures only |
+| M1 — Native shell (accepted with keyboard access debt) | SwiftUI menu bar app with mocked states | Physical Mac build, popover/theme/settings, scenario persistence, demo link dialog, Quit verified; keyboard/VoiceOver reserved for mandatory pre-release QA (#3) |
 | M2 — Domain engine | Store, normalizer, counters, diff, scheduler | Unit tests for status maps, deadlines, duplicate event handling, baseline import, migrations |
 | M3 — ClickUp | First end-to-end provider integration | Authorized scoped tasks, pagination, read-only mapping and links; secrets never in bundle; auth release path documented |
 | M4 — Trello | Board/card synchronization | Per-board status mapping, due behavior, scoped connection and links; quota tests |
