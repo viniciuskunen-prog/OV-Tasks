@@ -1,6 +1,6 @@
 # Security and privacy model
 
-**Status (2026-10-22):** M3A development branch adds an **untested** macOS Keychain token store and pinned read-only ClickUp client. Security audit, live connection review and release controls remain mandatory.
+**Status (2026-10-22):** M3A development branch adds a macOS Keychain token store and pinned read-only ClickUp client compiled under XCTest; a live Keychain credential roundtrip and real network integration remain **untested**. Security audit, live connection review and release controls remain mandatory.
 
 ## Principles
 Local-first, read-only, least privilege, transparent source selection and data minimization. This public repository **must not contain secrets, real task data, private customer information, personal access links or internal operational history**.
