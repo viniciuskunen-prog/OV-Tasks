@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status (2026-10-22):** M1 menu bar preview validated; M2 normalized domain and SQLite core merged into `main` after **13 XCTest tests (0 failures)** and five standalone smoke groups. M2.5 synthetic core-backed UI and provider ingestion passed local integration smoke, macOS compilation and dark-mode visual/filter QA; PR #6 is synchronized with `main` and undergoing final review. No live integrations or stable release.
+> **Status (2026-10-22):** M1 menu bar preview validated; M2 normalized domain and SQLite core merged into `main` after **13 XCTest tests (0 failures)** and five standalone smoke groups. M2.5 synthetic core-backed UI and provider ingestion passed local integration smoke, macOS compilation and dark-mode visual/filter QA; PR #6 **merged into `main`** (M2.5 synthetic UI milestone accepted). No live integrations or stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -27,7 +27,7 @@ The build output is local, unsigned for distribution (ad-hoc only), and uses fic
 
 ## M2 core tests (accepted in main)
 
-The accepted M2 core (`OVTasksCore`) is a Swift Package with normalized models, scoped counters, baseline-safe event diffs and transactional SQLite snapshots. **13 XCTest cases passed (0 failures) on a real Mac with Xcode 27.1** before PR #5 was merged into `main`. The separate M2.5 branch connects the core to a synthetic popover; its direct integration smoke, native app compilation and primary dark-mode visual/filter QA also passed on the Mac. See [M2 core and QA](docs/M2_CORE.md) and [M2.5 bridge](docs/M25_PREVIEW_BRIDGE.md). No real provider data has been tested.
+The accepted M2 core (`OVTasksCore`) is a Swift Package with normalized models, scoped counters, baseline-safe event diffs and transactional SQLite snapshots. **13 XCTest cases passed (0 failures) on a real Mac with Xcode 27.1** before PR #5 was merged into `main`. M2.5 now connects the core to a synthetic popover in `main`; its direct integration smoke, native app compilation and primary dark-mode visual/filter QA passed on the Mac. See [M2 core and QA](docs/M2_CORE.md) and [M2.5 bridge](docs/M25_PREVIEW_BRIDGE.md). No real provider data has been tested.
 
 ## Project documentation
 
