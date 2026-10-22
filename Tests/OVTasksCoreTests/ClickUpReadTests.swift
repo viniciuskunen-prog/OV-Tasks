@@ -22,7 +22,7 @@ private struct StubClickUpCredentials: ClickUpCredentialSource {
 final class ClickUpReadTests: XCTestCase {
     private let scope = WatchedScope(providerID: "clickup", accountID: "22", scopeID: "1234")
 
-    private func json(_ dictionary: [String: Any]) -> Data {
+    private static func json(_ dictionary: [String: Any]) -> Data {
         // Only synthetic values. Never fixture-dump a live provider response.
         try! JSONSerialization.data(withJSONObject: dictionary)
     }
@@ -54,23 +54,23 @@ final class ClickUpReadTests: XCTestCase {
             XCTAssertEqual(request.url?.host, "api.clickup.com")
             switch request.url?.path {
             case "/api/v2/user":
-                return ClickUpHTTPResult(statusCode: 200, data: self.json([
+                return ClickUpHTTPResult(statusCode: 200, data: Self.json([
                     "user": ["id": 22, "username": "Test user"]
                 ]))
             case "/api/v2/team":
-                return ClickUpHTTPResult(statusCode: 200, data: self.json([
+                return ClickUpHTTPResult(statusCode: 200, data: Self.json([
                     "teams": [["id": "99", "name": "Example Workspace"]]
                 ]))
             case "/api/v2/team/99/space":
-                return ClickUpHTTPResult(statusCode: 200, data: self.json([
+                return ClickUpHTTPResult(statusCode: 200, data: Self.json([
                     "spaces": [["id": 77, "name": "Studio"]]
                 ]))
             case "/api/v2/space/77/folder":
-                return ClickUpHTTPResult(statusCode: 200, data: self.json([
+                return ClickUpHTTPResult(statusCode: 200, data: Self.json([
                     "folders": [["id": "5", "name": "Clients"]]
                 ]))
             case "/api/v2/folder/5/list":
-                return ClickUpHTTPResult(statusCode: 200, data: self.json([
+                return ClickUpHTTPResult(statusCode: 200, data: Self.json([
                     "lists": [["id": "1234", "name": "Tasks"]]
                 ]))
             default:
@@ -80,10 +80,14 @@ final class ClickUpReadTests: XCTestCase {
         let client = ClickUpReadClient(transport: transport)
         let profile = try await client.authorizedUser(token: "fixture-only")
         XCTAssertEqual(profile.id.value, "22")
-        XCTAssertEqual(try await client.workspaces(token: "fixture-only").first?.id.value, "99")
-        XCTAssertEqual(try await client.spaces(workspaceID: "99", token: "fixture-only").first?.id.value, "77")
-        XCTAssertEqual(try await client.folders(spaceID: "77", token: "fixture-only").first?.id.value, "5")
-        XCTAssertEqual(try await client.lists(folderID: "5", token: "fixture-only").first?.id.value, "1234")
+        let workspaces = try await client.workspaces(token: "fixture-only")
+        let spaces = try await client.spaces(workspaceID: "99", token: "fixture-only")
+        let folders = try await client.folders(spaceID: "77", token: "fixture-only")
+        let lists = try await client.lists(folderID: "5", token: "fixture-only")
+        XCTAssertEqual(workspaces.first?.id.value, "99")
+        XCTAssertEqual(spaces.first?.id.value, "77")
+        XCTAssertEqual(folders.first?.id.value, "5")
+        XCTAssertEqual(lists.first?.id.value, "1234")
     }
 
     func testStatusDateAndLinkNormalization() async throws {
@@ -95,7 +99,7 @@ final class ClickUpReadTests: XCTestCase {
         var completed = task(11, name: "Finished", type: "closed")
         completed["date_done"] = "1800000000000"
         completed["url"] = "https://unexpected.example/redirect"
-        let payload = json(["tasks": [example, completed], "last_page": true])
+        let payload = Self.json(["tasks": [example, completed], "last_page": true])
         let client = makeAdapter(StubClickUpTransport { request in
             XCTAssertEqual(request.httpMethod, "GET")
             return ClickUpHTTPResult(statusCode: 200, data: payload)
@@ -109,16 +113,16 @@ final class ClickUpReadTests: XCTestCase {
         if case .calendarDay(let day)? = result.tasks[0].deadline {
             XCTAssertEqual(day.timeZoneID, "America/Sao_Paulo")
         } else { XCTFail("Date-only deadline should be a local calendar day") }
-        XCTAssertEqual(result.tasks[1].status, .inProgress,
-                       "Explicit status mapping is intentionally higher priority than provider type.")
+        XCTAssertEqual(result.tasks[1].status, .done,
+                       "ClickUp terminal status must override arbitrary name mapping.")
         XCTAssertNil(result.tasks[1].originalURL)
-        XCTAssertNil(result.tasks[1].completedAt,
-                     "An in-progress task must not count as complete solely from a date field.")
+        XCTAssertNotNil(result.tasks[1].completedAt,
+                        "A completed task's real completion timestamp must be retained.")
     }
 
     func testCompletePaginationThenFailureDoesNotEraseCache() async throws {
-        let firstPage = json(["tasks": (0..<100).map { task($0) }, "last_page": false])
-        let secondPage = json(["tasks": [task(100)], "last_page": true])
+        let firstPage = Self.json(["tasks": (0..<100).map { task($0) }, "last_page": false])
+        let secondPage = Self.json(["tasks": [task(100)], "last_page": true])
         let goodTransport = StubClickUpTransport { request in
             let query = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems ?? []
             XCTAssertTrue(query.contains(where: { $0.name == "include_closed" && $0.value == "true" }))
@@ -160,7 +164,7 @@ final class ClickUpReadTests: XCTestCase {
     }
 
     func testProviderRejectsInvalidScopeAndUnknownStatusWithoutGuessing() async throws {
-        let synthetic = json(["tasks": [task(30, type: "custom")], "last_page": true])
+        let synthetic = Self.json(["tasks": [task(30, type: "custom")], "last_page": true])
         let adapter = ClickUpListAdapter(
             client: ClickUpReadClient(transport: StubClickUpTransport { _ in
                 ClickUpHTTPResult(statusCode: 200, data: synthetic)
