@@ -103,10 +103,9 @@ public enum CoreDemoFactory {
             )
         }
 
-        return try await DemoDashboardSnapshot(
-            metrics: store.metrics(scopes: Set(scopes), now: now),
-            events: store.recentEvents(limit: 25)
-        )
+        let metrics = try await store.metrics(scopes: Set(scopes), now: now)
+        let events = try await store.recentEvents(limit: 25)
+        return DemoDashboardSnapshot(metrics: metrics, events: events)
     }
 
     private static func displayTitle(_ index: Int) -> String {
