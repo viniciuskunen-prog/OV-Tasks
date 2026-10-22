@@ -20,4 +20,4 @@ Prefer local Swift builds/tests. Do not introduce costly automatic hosted macOS 
 Implement the typed adapter and capability flags, source URL validation, pagination, quota handling, error classification and test fixtures. A connector must not need access to another provider's credentials or the user's private file system.
 
 ## Development status
-No Xcode project and no executable code are present at the documentation bootstrap milestone. Build instructions will be added and verified when the shell is implemented.
+A lightweight SwiftUI menu bar prototype is now in source. For local build and QA, see [M1_PROTOTYPE.md](docs/M1_PROTOTYPE.md). The build is **not yet validated on a physical Mac**, and there are no network integrations.
