@@ -58,6 +58,45 @@ sw_vers -productVersion
 
 Do not rerun blindly or enable costly hosted GitHub Actions. Correct the smallest reproducible issue in the M2 branch through the connector and repeat locally.
 
+## SwiftPM manifest-link error: Command Line Tools
+
+On a contributor Apple Silicon Mac on 2026-10-22, `swift test` failed **before compiling the package target**, with:
+
+```text
+error: 'ov-tasks': Invalid manifest
+Undefined symbols for architecture arm64:
+  PackageDescription.Package.__allocating_init(... defaultLocalization: ... swiftLanguageVersions: ...)
+```
+
+The manifest compiler was located in `/Library/Developer/CommandLineTools/usr/bin/swiftc`. This exact undefined symbol has been reported outside this project in [Swift Forums](https://forums.swift.org/t/how-to-setup-swift-on-macos/79105), with Command Line Tools reinstallation resolving the reporter's machine. An unverified local toolchain/configuration mismatch is therefore suspected; **do not automatically rewrite Package.swift or claim this proves source code is broken**.
+
+Inspect the active developer tools safely:
+
+```zsh
+xcode-select -p
+xcrun swift --version
+swift package --version
+```
+
+If the full Xcode developer tools are installed at the default location, test with them **without changing the system-wide selection**:
+
+```zsh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test
+```
+
+If Xcode is absent, the built-in Swift compiler may still independently type-check the M2 core without invoking SwiftPM:
+
+```zsh
+xcrun swiftc -parse-as-library -typecheck -module-name OVTasksCore \
+  Sources/OVTasksCore/Models/TaskModels.swift \
+  Sources/OVTasksCore/Metrics/MetricsCalculator.swift \
+  Sources/OVTasksCore/Events/SnapshotDiffer.swift \
+  Sources/OVTasksCore/Sync/SyncPlanner.swift \
+  Sources/OVTasksCore/Persistence/SQLiteSnapshotStore.swift
+```
+
+This type-check is **not equivalent to running `swift test`** and provides no XCTest evidence. If developer tools need repair, use a compatible official Apple toolchain / CLT update process only after checking the installed versions and macOS release. Do not delete Command Line Tools blindly, disable security mechanisms, or introduce hosted GitHub Actions as a workaround.
+
 ## Tests included (NOT executed yet)
 
 - Composite ID safety (nil/empty/delimiter); explicit unmapped status UNKNOWN.
