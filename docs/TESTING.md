@@ -2,6 +2,10 @@
 
 **M1 local compilation and selected smoke tests completed on 2026-10-22; keyboard navigation failed and extended accessibility verification remains open.** This document describes future gates; see [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for evidence and remaining checks.
 
+## M2.5 stacked branch validation pending
+
+The M2.5 branch introduces `zsh ./test-m25-direct.sh`, which compiles and exercises real-core synthetic dashboard calculation and fake paginated adapter ingestion without SwiftPM. It has **not yet been run**; then `zsh ./build.sh` must compile the SwiftUI app and visual QA must confirm that overview metrics/events are computed, not hard-coded. See [M25_PREVIEW_BRIDGE.md](M25_PREVIEW_BRIDGE.md).
+
 ## M2 tests awaiting execution
 
 The M2 branch adds Swift Package unit tests at `Tests/OVTasksCoreTests`. Run `swift test` locally from the repo root after checking out `feat/m2-domain-store`. Tests cover scoped metrics, DST, silent baseline, deduplicated repeated polls, SQL durability, account isolation, snapshot validation and pure rate-limit scheduling. No tests for this branch have actually been executed yet. Report the exact command output before accepting M2. See [M2_CORE.md](M2_CORE.md).
