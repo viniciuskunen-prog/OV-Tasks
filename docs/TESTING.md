@@ -2,13 +2,13 @@
 
 **M1 local compilation and selected smoke tests completed on 2026-10-22; keyboard navigation failed and extended accessibility verification remains open.** This document describes future gates; see [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for evidence and remaining checks.
 
-## M2.5 stacked branch validation pending
+## M2.5 local integration validation — 2026-10-22
 
-The M2.5 branch introduces `zsh ./test-m25-direct.sh`, which compiles and exercises real-core synthetic dashboard calculation and fake paginated adapter ingestion without SwiftPM. It has **not yet been run**; then `zsh ./build.sh` must compile the SwiftUI app and visual QA must confirm that overview metrics/events are computed, not hard-coded. See [M25_PREVIEW_BRIDGE.md](M25_PREVIEW_BRIDGE.md).
+The contributor ran `zsh ./test-m25-direct.sh` on a physical Mac: synthetic core-backed dashboard 18/6/3/5 and four change events PASS; paginated fake adapter, preservation of last valid SQLite snapshot after second-page failure, and repeated-cursor rejection PASS. `zsh ./build.sh` compiled and signed the app, and post-relaunch screenshots verified header M2.5, feed/four metrics, and Important filter reducing four events to three. Light appearance, all M2.5 view scenarios, keyboard/VoiceOver remain unverified on the M2.5 binary and must be checked before public release. See [M25_PREVIEW_BRIDGE.md](M25_PREVIEW_BRIDGE.md).
 
-## M2 tests awaiting execution
+## M2 native XCTest — accepted and merged 2026-10-22
 
-The M2 branch adds Swift Package unit tests at `Tests/OVTasksCoreTests`. Run `swift test` locally from the repo root after checking out `feat/m2-domain-store`. Tests cover scoped metrics, DST, silent baseline, deduplicated repeated polls, SQL durability, account isolation, snapshot validation and pure rate-limit scheduling. No tests for this branch have actually been executed yet. Report the exact command output before accepting M2. See [M2_CORE.md](M2_CORE.md).
+With Xcode 27.1 installed, the contributor ran `swift test --jobs 2` twice on physical Apple Silicon macOS. Native XCTest: 9 DomainTests + 4 StoreTests, **13 tests passed, 0 failures**, shell exit code **0**. The separate Swift Testing runner showed zero tests because the project uses XCTest. M2 additionally passed five direct-swiftc regression groups; PR #5 has been merged into `main`. See [M2_CORE.md](M2_CORE.md) for exact QA evidence.
 
 ## Test matrix
 | Area | Cases |
