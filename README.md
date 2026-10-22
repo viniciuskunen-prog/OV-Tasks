@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status:** M1 native preview built and visually reviewed on macOS in light and dark mode (2026-10-22); keyboard-only access remains a known issue to resolve before stable release. No stable release or live integrations.
+> **Status:** M1 native preview validated on macOS; M2 domain engine and SQLite cache implemented as source on a separate branch, **pending local Swift Package tests**. No stable release or live integrations.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -25,9 +25,14 @@ open ./build/OVTasks.app
 
 The build output is local, unsigned for distribution (ad-hoc only), and uses fictional data exclusively. **No login, network sync or native notifications** are implemented yet. See [M1 prototype and QA guide](docs/M1_PROTOTYPE.md).
 
+## M2 core tests (development branch)
+
+The M2 branch introduces `OVTasksCore` as a separate Swift Package with normalized task models, scoped counters, baseline-safe event diffs, atomic SQLite snapshots and deterministic tests. **This core is not yet connected to the M1 popover.** Run `swift test` on a Mac with Command Line Tools; see [M2 core and QA](docs/M2_CORE.md). Its correctness is **not yet validated** until those tests pass.
+
 ## Project documentation
 
 - [M1 native interface preview / build / visual QA](docs/M1_PROTOTYPE.md)
+- [M2 core, local persistence and Swift test guide](docs/M2_CORE.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)
