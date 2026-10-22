@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status: M1 app shell validated on macOS; M2 independent `OVTasksCore` implementation exists in source, not yet compiled/tested or connected to UI. Actual provider fetching and notifications do not exist.**
+**Status: M1 app shell validated; M2 core passed a five-group direct Swift runtime smoke, with XCTest blocked by local SwiftPM. M2.5 branch adds an unvalidated synthetic bridge and typed paging contract. No live providers or notifications exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
@@ -41,6 +41,10 @@ AGENTS.md
 .gitignore
 ```
 The M1 SwiftUI files remain under `Sources/OVTasksApp`. The M2 branch implements `Sources/OVTasksCore/{Models,Metrics,Events,Persistence,Sync}` plus `Package.swift` and `Tests/OVTasksCoreTests`. Connector/notification/security/runtime integration folders in the illustration above are **future targets**, not working code. See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) and [M2_CORE.md](M2_CORE.md).
+
+## M2.5 development bridge
+
+The stacked M2.5 branch introduces `CoreDemoFactory` (random temporary SQLite populated only with synthetic tasks), `PreviewStore` asynchronous loading and adapters for rendering `DashboardMetrics`/`ChangeEvent` in the existing SwiftUI popover. It also adds `ProviderAdapter` + `SnapshotIngestor`, a typed pagination collector that refuses partial commits. This is code **awaiting macOS build/test**, not a provider client. See [M2.5 preview](M25_PREVIEW_BRIDGE.md) and [provider contract](PROVIDER_CONTRACT.md).
 
 ## Data flow
 1. User authorizes a provider; token/refresh material goes to Keychain only.
