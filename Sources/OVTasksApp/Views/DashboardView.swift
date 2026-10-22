@@ -103,7 +103,8 @@ struct DashboardView: View {
                 Image(systemName: "slider.horizontal.3")
                     .frame(width: 24, height: 24)
             }
-            .menuStyle(.borderlessButton)
+            .menuStyle(.button)
+            .buttonStyle(.borderless)
             .help("Alternar cenário da prévia")
             .accessibilityLabel("Alternar cenário da prévia")
 
