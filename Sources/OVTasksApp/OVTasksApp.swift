@@ -16,6 +16,7 @@ struct OVTasksApp: App {
         Settings {
             PreviewSettingsView()
                 .environmentObject(preview)
+                .environmentObject(clickUp)
         }
     }
 }
