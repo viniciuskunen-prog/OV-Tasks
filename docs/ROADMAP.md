@@ -1,12 +1,12 @@
 # Implementation roadmap
 
-**Status:** M0/M1 completed for the documented scope. M2 task domain, event diff, SQLite cache, pure poll planner and tests are in source, **awaiting local Swift tests**. M3+ provider integrations remain planned; accessibility issue #3 remains a pre-release blocker. No time estimates are implied.
+**Status (2026-10-22):** M0/M1 completed for documented scope. M2 core passed local XCTest (13 tests, zero failures, exit code 0) and five direct-swiftc smoke groups. M2.5 synthetic UI bridge has passed local macOS runtime/visual smoke in its stacked draft PR; provider integrations M3+ are still planned. Accessibility issue #3 remains a public-release blocker.
 
 | Milestone | Goal | Acceptance / exit criteria |
 | --- | --- | --- |
 | M0 — Documentation baseline | Public repo, developer docs and governance | README, architecture, provider contract, UI spec, security, contributing guide, no secrets |
 | M1 — Native shell (accepted with keyboard access debt) | SwiftUI menu bar app with mocked states | Physical Mac build, popover/theme/settings, scenario persistence, demo link dialog, Quit verified; keyboard/VoiceOver reserved for mandatory pre-release QA (#3) |
-| M2 — Domain engine (source prepared, QA pending) | Normalized models, counters, diff, SQLite cache, poll planning | Local `swift test` passes, baseline/duplicate/DST/account-isolation tests pass; M2 is core-only (no live scheduler or UI data binding) |
+| M2 — Domain engine (XCTest accepted) | Normalized models, counters, diff, SQLite cache, poll planning | Local `swift test` passes, baseline/duplicate/DST/account-isolation tests pass; M2 is core-only (no live scheduler or UI data binding) |
 | M3 — ClickUp | First end-to-end provider integration | Authorized scoped tasks, pagination, read-only mapping and links; secrets never in bundle; auth release path documented |
 | M4 — Trello | Board/card synchronization | Per-board status mapping, due behavior, scoped connection and links; quota tests |
 | M5 — NanoTask | Authenticated least-privilege client | Dedicated API contract, RLS/isolation tests, no publication of private NanoTask internals |
