@@ -14,6 +14,10 @@ With Xcode 27.1 installed, the contributor ran `swift test --jobs 2` twice on ph
 
 Four new synthetic XCTest methods in `ClickUpReadTests.swift` passed on the user's physical Mac with Xcode 27.1: read-only identity/discovery, status/date/link normalization, fully paged ingestion with HTTP 429 preserving the SQLite snapshot, and unknown status/scope/cursor rejection. Full package XCTest **17 passed, 0 failures** (4 ClickUp, 9 Domain, 4 Store); separate M2.5 smoke script passed and demo macOS app compiled. **No live ClickUp requests, no Keychain credential roundtrip through a signed app, and no ClickUp UI integration tested.** See [M3A guide](M3_CLICKUP_FOUNDATION.md).
 
+## M3B native UI and real provider acceptance — NOT YET TESTED
+
+M3B adds macOS Settings SecureField, explicit ClickUp Workspace/Space/list consent, local Keychain access, manual paginated sync to Application Support SQLite, connected-only metrics/activity and local disconnect. **No native compile or UI/Keychain/live API result has been received yet.** From the M3B branch run existing 17 XCTest cases (M3A/core), then `zsh ./build.sh`, which now compiles the real connection UI. Only after build success perform controlled account verification entirely inside the running app, without ever pasting tokens/task names in GitHub, Drive or chat. Include cancel/offline/429, cache restart, selection and disconnect tests; see [M3B guide](M3B_CLICKUP_CONNECTION.md). Do not merge/release based on earlier M3A XCTest alone.
+
 ## Test matrix
 | Area | Cases |
 | --- | --- |
