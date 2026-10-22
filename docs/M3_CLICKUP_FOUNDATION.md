@@ -1,6 +1,6 @@
 # M3A — ClickUp read-only foundation (developer candidate)
 
-**Status 2026-10-22:** Branch implemented; native compilation and XCTest have **NOT YET RUN** on contributor's Mac. This PR does **not** connect a ClickUp account through the app and must not be advertised as a live sync.
+**Status 2026-10-22: local core QA PASSED.** Contributor's physical Mac (Xcode 27.1) compiled and ran the package: **17 XCTest methods passed (4 ClickUp, 9 Domain, 4 Store), zero failures**. Separately, M2.5 direct integration smoke and the existing macOS preview build passed. **No real ClickUp account connected and no live sync performed**; M3A remains the tested connector foundation, not an end-to-end feature.
 
 ## Scope and official API verification
 
@@ -22,7 +22,7 @@ Sources: [authentication](https://developer.clickup.com/docs/authentication), [g
 - Date-only deadline with `due_date_time=false` uses the selected timezone and `LocalDueDay`; exact deadline uses a timestamp. Note: timezone behavior still needs **comparison with live ClickUp UI** before claiming a production-correct all-day deadline.
 - Verified HTTPS task links restricted to `app.clickup.com` and `clickup.com`; malformed or other-origin links are dropped.
 - `ClickUpKeychain.swift`: actor-backed per-account local generic-password item; accessible only when unlocked and only on this device; updates atomically, no plaintext token in repo/SQLite/preferences.
-- `ClickUpReadTests.swift`: four synthetic XCTest checks for workspace/list discovery, decoding/status/due/link mapping, full two-page ingestion with 429 preserving cache, and unknown statuses/scope/cursor rejection. **These tests have not yet run.**
+- `ClickUpReadTests.swift`: four synthetic XCTest checks for workspace/list discovery, decoding/status/due/link mapping, full two-page ingestion with 429 preserving cache, and unknown statuses/scope/cursor rejection. **All four passed on the contributor's Mac on 2026-10-22.**
 
 ## Explicit non-goals
 
@@ -32,7 +32,39 @@ Before M3 can be accepted, a separate M3B implementation must supply explicit ac
 
 Other gaps: rate-limit retry/backoff integration, per-list status mapping UX, all-day timezone validation against ClickUp UI, more exhaustive page/duplicate/reconnect tests, provider-specific link/deep-link actions, and accessibility issue #3. No background polling or notifications in M3A.
 
-## Run and report local acceptance
+## Actual local acceptance — 2026-10-22
+
+Contributor pulled `feat/m3a-clickup-readonly-foundation` to the physical Apple Silicon Mac and ran:
+
+```zsh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2
+zsh ./test-m25-direct.sh
+zsh ./build.sh
+```
+
+Observed native XCTest summary:
+
+```text
+Build complete! (3,18 seg)
+Test Suite 'ClickUpReadTests' passed.
+    Executed 4 tests, with 0 failures (0 unexpected)
+Test Suite 'DomainTests' passed.
+    Executed 9 tests, with 0 failures (0 unexpected)
+Test Suite 'StoreTests' passed.
+    Executed 4 tests, with 0 failures (0 unexpected)
+Test Suite 'OVTasksCoreTests.xctest' passed.
+    Executed 17 tests, with 0 failures (0 unexpected)
+Test Suite 'All tests' passed.
+    Executed 17 tests, with 0 failures (0 unexpected)
+```
+
+A subsequent Swift Testing runner reported `0 tests in 0 suites`; this is separate from XCTest and not an XCTest failure.
+
+Direct core-backed smoke reported **PASS** for metrics `18 / 6 / 3 / 5`, four change events, pagination, atomic snapshot retention on failure and repeated-cursor detection. `zsh ./build.sh` completed, with `Info.plist: OK` and ad-hoc app signing. **That app build is still the unchanged M2.5 synthetic preview; the ClickUp HTTP/Keychain code was compiled as Swift Package sources by XCTest, not integrated into the preview app.**
+
+**QA verdict: M3A foundation accepted for its documented synthetic test scope.** Keychain roundtrip with real signed app, live ClickUp API contract, auth UI, real account/scope selection, rate-limit backoff, real first sync and public OAuth are *not* covered. No tokens used, and no GitHub Actions were run.
+
+## Reproduce the local test (optional)
 
 Use full Xcode 27.1 for `swift test`, which previously passed the 13 M2 core XCTest cases.
 
@@ -48,6 +80,6 @@ zsh ./build.sh
 git status --short
 ```
 
-Expected only **if tests actually pass**: previous 13 M2 cases plus four new `ClickUpReadTests` XCTest methods (17 total), M2.5 synthetic smoke, and the unchanged native demo build. The exact compiled/tested results must be supplied before treating M3A as accepted or merging the PR. If source compile fails, fix it on this branch via GitHub before advancing.
+**Observed on 2026-10-22:** 17 XCTest passed (0 failures), M2.5 direct smoke PASS and demo app build PASS. Further testing is required for real signed-app Keychain access and provider requests, neither of which this milestone claims.
 
 No GitHub Actions are configured or consumed by this work.
