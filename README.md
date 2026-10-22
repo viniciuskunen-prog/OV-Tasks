@@ -27,6 +27,7 @@ OV Tasks answers two questions: **How much work is pending?** and **What changed
 - [Roadmap and acceptance criteria](docs/ROADMAP.md)
 - [Testing strategy](docs/TESTING.md)
 - [Architecture decision records](docs/DECISIONS.md)
+- [Public/private documentation policy](docs/DOCUMENTATION_POLICY.md)
 - [Contributor guidelines](CONTRIBUTING.md)
 - [Agent instructions](AGENTS.md)
 
