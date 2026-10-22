@@ -1,0 +1,36 @@
+# Xcode / Swift
+.DS_Store
+*.xcuserstate
+xcuserdata/
+DerivedData/
+.build/
+.build-artifacts/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+*.app/
+*.dSYM/
+*.ipa
+*.zip
+build/
+# Local authorization and secrets
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.key
+*.pem
+*.mobileprovision
+Secrets.swift
+secrets.json
+credentials.json
+private/
+# Local runtime/database
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.log
+# Test output
+TestResults/
+coverage/
+*.xcresult/
