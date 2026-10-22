@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status:** planning / pre-implementation. There is no compiled app or stable release yet.
+> **Status:** M1 native preview built and visually reviewed on macOS in light and dark mode (2026-10-22); keyboard-only access remains a known issue to resolve before stable release. No stable release or live integrations.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -14,8 +14,20 @@ OV Tasks answers two questions: **How much work is pending?** and **What changed
 - Read-only connectors planned for **ClickUp, Trello and NanoTask**; a provider-adapter architecture for future services.
 - Local-first operation without requiring the maintainer's Mac mini or a permanent server.
 
+## Try the M1 interface preview
+
+On macOS 14+ with Xcode Command Line Tools, from a checkout:
+
+```zsh
+zsh ./build.sh
+open ./build/OVTasks.app
+```
+
+The build output is local, unsigned for distribution (ad-hoc only), and uses fictional data exclusively. **No login, network sync or native notifications** are implemented yet. See [M1 prototype and QA guide](docs/M1_PROTOTYPE.md).
+
 ## Project documentation
 
+- [M1 native interface preview / build / visual QA](docs/M1_PROTOTYPE.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)

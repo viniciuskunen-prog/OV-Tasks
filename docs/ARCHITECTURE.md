@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status: proposal — components not yet implemented.**
+**Status: architecture proposal; only the M1 SwiftUI app shell, synthetic preview model and local build script are implemented in source. No core sync or connectors exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
@@ -40,7 +40,7 @@ CONTRIBUTING.md
 AGENTS.md
 .gitignore
 ```
-Only create paths when their code is implemented; this is a target design, not an existing tree.
+The M1 source currently uses `Sources/OVTasksApp/OVTasksApp.swift`, `Preview/PreviewData.swift`, `Views/DashboardView.swift` and `Settings/PreviewSettingsView.swift`; the remaining folders above are future design targets, not an existing tree. Refer to [M1_PROTOTYPE.md](M1_PROTOTYPE.md).
 
 ## Data flow
 1. User authorizes a provider; token/refresh material goes to Keychain only.
