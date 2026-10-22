@@ -145,7 +145,40 @@ softwareupdate --list
 
 These commands report the currently installed Command Line Tools package receipt and any Apple-supported updates available for that Mac; they do not install or uninstall anything. Apple recommends checking for a Command Line Tools version compatible with the macOS release and using Software Update or the official Apple Developer downloads. See [Apple: Installing the command-line tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools).
 
-If Software Update offers a compatible Command Line Tools update, apply it through **System Settings → General → Software Update** after verifying the offered version. If none is available, check Apple's official [More Downloads](https://developer.apple.com/download/all/) for a compatible complete CLT installer or full Xcode; installing a matching Xcode and testing it using `DEVELOPER_DIR` does not require changing `xcode-select` globally. Avoid `sudo rm -rf /Library/Developer/CommandLineTools` and avoid reinstalling an arbitrary Xcode version without checking macOS compatibility.
+**Actual inventory on the contributor Mac (2026-10-22):**
+
+```text
+package-id: com.apple.pkg.CLTools_Executables
+version: 27.0.0.0.1788430756
+Software Update Tool
+Finding available software
+No new software available.
+```
+
+No update is offered through `softwareupdate`. This does not prove that a separately downloadable Command Line Tools installer is unavailable on Apple Developer Downloads.
+
+**Recommended lower-risk way to isolate the broken CLI installation:** use a separate **stable full Xcode 27.1** bundle (released 2026-10-15), if disk space allows. The [Apple Xcode system requirements](https://developer.apple.com/xcode/system-requirements) list Xcode 27.1 as compatible with macOS Tahoe 26.6 or later, Swift 6.4 and macOS 27 SDKs; first check the real host system version with `sw_vers -productVersion`. Apple links: [stable Xcode 27.1 release](https://developer.apple.com/news/releases/?id=10152026a), [official Apple developer downloads](https://developer.apple.com/download/all/), or [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?mt=12). Prefer the stable 27.1 release over the separate 27.2 RC for this project. **The user has not installed this Xcode as part of our tests.**
+
+After installing and opening Xcode once to finish first-launch components/licenses, run the checks below with a **per-command developer directory override**. This keeps the global `xcode-select -p` pointing at CLT, avoiding changes to other projects:
+
+```zsh
+sw_vers -productVersion
+df -h /Applications
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcodebuild -version
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcrun --find xctest
+
+cd ~/Projects/OV-Tasks
+git fetch origin
+git switch feat/m2-domain-store
+git pull --ff-only
+
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift package dump-package >/dev/null && \
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2
+```
+
+These commands are **future instructions, not completed test results**. If SwiftPM fails with Xcode's toolchain too, inspect it separately; do not assume installation guarantees success. If disk space prevents a full Xcode installation, compare Apple's officially available `Command Line Tools for Xcode 27.1` or compatible package **only if such a download is actually listed**, but note that installing CLT packages replaces the single system-wide CLT installation and could affect other work. Avoid `sudo rm -rf /Library/Developer/CommandLineTools` unless intentionally following an approved repair plan.
+
+
 
 After repairing the toolchain, rerun `zsh ./diagnose-swiftpm.sh`. Only after a minimal probe passes should we retry `swift test --jobs 2` and then resolve any XCTest compilation/logic failures separately. The M2 five-group runtime smoke and M2.5 demo/UI smoke already **passed** with direct `swiftc` and remain valid for their tested scenarios.
 
