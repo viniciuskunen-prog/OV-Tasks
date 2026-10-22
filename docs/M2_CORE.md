@@ -1,6 +1,6 @@
 # M2 — Domain engine and local snapshot cache
 
-**Status:** source code prepared for local macOS Swift Package tests. **Not compiled or tested on a Mac yet.** Do not treat this as a successful test result.
+**Status (2026-10-22): all five OVTasksCore source files typechecked and the direct Swift compiler regression binary compiled and passed its five groups on an Apple Silicon Mac. The separate SwiftPM/XCTest suite is still blocked during Package.swift manifest linking and has not run. This is partial, not full, M2 acceptance.**
 
 ## Scope implemented in code
 
@@ -116,11 +116,30 @@ git pull --ff-only
 zsh ./test-m2-direct.sh
 ```
 
-It covers five groups: identifier/status mapping, DST/deadline/metrics, baseline-safe event diffs, poll scheduling, and SQLite atomic snapshot persistence/account isolation. The runner is an actual executable — it is **not merely type-checking** — but **it is not a substitute for the full XCTest suite**. If it passes, record the exact output and still keep the SwiftPM/XCTest issue as a separate tooling acceptance item. Until its first real run, the standalone smoke test itself is **unvalidated**.
+It covers five groups: identifier/status mapping, DST/deadline/metrics, baseline-safe event diffs, poll scheduling, and SQLite atomic snapshot persistence/account isolation. The runner is an actual executable — it is **not merely type-checking** — but **it is not a substitute for the full XCTest suite**. If it passes, record the exact output and still keep the SwiftPM/XCTest issue as a separate tooling acceptance item. The standalone smoke test **has now been executed successfully** on the contributor's Mac; record below. This does **not** validate the separate XCTest suite.
 
 Avoid changing global toolchain selection or installing a second Xcode just to run this fallback. The compiled smoke executable remains under `.build/m2-direct-smoke/` and no data leaves the Mac.
 
-## Tests included (NOT executed yet)
+## Actual macOS regression run — 2026-10-22
+
+The contributor switched to the `feat/m2-domain-store` branch, fast-forwarded from origin, and executed `zsh ./test-m2-direct.sh`. Terminal transcript:
+
+```text
+Building OVTasksCore regression runner with swiftc (no Swift Package Manager)...
+Running synthetic-data regression checks...
+PASS: 5 smoke groups — identity/status, dates/metrics, events, scheduling, SQLite
+NOTE: XCTest suite has NOT been executed; this is a targeted direct-swiftc regression.
+
+Direct Swift smoke checks succeeded. XCTest / 'swift test' remains pending.
+```
+
+**Verified in this run:** successful compilation and execution of the stand-alone regression executable using the real M2 implementation plus SQLite3, with five synthetic-data check groups. Prior `swiftc -typecheck` also passed for all five core source files.
+
+**Not verified:** every existing XCTest case; SwiftPM manifest loading; performance/stress; migration/upgrades; crash recovery; provider APIs; background scheduling; UI binding. The SwiftPM error is not caused by any proven source-level failure; do not claim all future SwiftPM tests will pass.
+
+**Acceptance status:** runtime smoke **PASS**, full `swift test` **BLOCKED by local SwiftPM manifest/link environment**, M2 remains in draft pending full QA or an explicit revised release gate. No GitHub Actions, service credentials or modifications to the M1 menu bar app were involved.
+
+## XCTest cases included (NOT executed yet)
 
 - Composite ID safety (nil/empty/delimiter); explicit unmapped status UNKNOWN.
 - Exact calendar-day expiration, invalid dates/timezones, 23-hour DST transition.
