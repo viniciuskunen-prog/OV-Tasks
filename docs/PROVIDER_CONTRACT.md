@@ -1,6 +1,6 @@
 # Provider adapter contract — v0.1
 
-**Status:** `ProviderAdapter`, `ProviderPage`, `ProviderCapabilities`, `ProviderSyncError` and `SnapshotIngestor` implemented in source on the M2.5 branch. **Not yet verified on a Mac.** ClickUp, Trello and NanoTask real adapters and authorization are still planned.
+**Status:** `ProviderAdapter`, `ProviderPage`, `ProviderCapabilities`, `ProviderSyncError` and `SnapshotIngestor` implemented in source on the M2.5 branch. **Verified by direct Swift compilation/execution and synthetic multi-page tests on a physical Mac on 2026-10-22 (success, second-page failure retaining cache, repeated cursor detection).** ClickUp, Trello and NanoTask real adapters and authorization are still planned.
 
 ## Boundary
 
@@ -37,7 +37,7 @@ The ingestor is a **library function**, not an automatic polling service. Networ
 
 The branch includes `Tests/M25StandaloneSmoke.swift`, which creates a synthetic two-page adapter and deliberately fails on its second page or repeats a cursor. No external URLs are fetched, no real credentials exist and tests operate on disposable SQLite files.
 
-To run, follow [M2.5 preview verification](M25_PREVIEW_BRIDGE.md). Once the local SwiftPM manifest issue is resolved, add equivalent XCTest contract tests to the package suite.
+To run, follow [M2.5 preview verification](M25_PREVIEW_BRIDGE.md). The CLT-only SwiftPM manifest issue was overcome by installing Xcode 27.1. The core's existing 13 XCTest cases passed, but **these adapter contract cases were exercised by `test-m25-direct.sh`, not by XCTest**. Add equivalent XCTest tests for adapter cases before production provider integrations.
 
 ## Extensibility decisions
 
