@@ -1,6 +1,6 @@
 # Interface and UX specification
 
-**Status: UI proposal implemented as M1 SwiftUI prototype source; native build and screenshots not yet validated.**
+**Status: M1 SwiftUI prototype built and visually reviewed on macOS in dark and light mode on 2026-10-22. Keyboard focus navigation remains a known accessibility issue (#3), deferred from M1 but required before stable release.**
 
 ## Layout
 - macOS menu bar monochrome icon, readable in light/dark mode; optional small urgent/unread marker that does not rely only on color.
