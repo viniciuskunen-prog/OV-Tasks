@@ -97,6 +97,29 @@ xcrun swiftc -parse-as-library -typecheck -module-name OVTasksCore \
 
 This type-check is **not equivalent to running `swift test`** and provides no XCTest evidence. If developer tools need repair, use a compatible official Apple toolchain / CLT update process only after checking the installed versions and macOS release. Do not delete Command Line Tools blindly, disable security mechanisms, or introduce hosted GitHub Actions as a workaround.
 
+## SwiftPM manifest compatibility experiment — 2026-10-22
+
+An isolated change on PR #5 updates the manifest from `// swift-tools-version: 5.9` to `6.0` and explicitly sets `swiftLanguageModes: [.v5]`. Swift PackageDescription 6 introduced the **new Package initializer** using `swiftLanguageModes` rather than the legacy `swiftLanguageVersions` parameter. The originally failing linker symbol references the legacy initializer. By forcing the new API, this experiment may avoid the missing symbol while keeping source compilation in Swift 5 language mode.
+
+**Not yet verified on macOS**. A separate external Swift Forums report of a similar undefined symbol even with newer tools versions means this is not guaranteed to fix an inconsistent Command Line Tools installation. The change does not modify any Swift source or the native `build.sh`.
+
+Run from the **parent M2 branch**, not M2.5:
+
+```zsh
+cd ~/Projects/OV-Tasks
+git fetch origin
+git switch feat/m2-domain-store
+git pull --ff-only
+swift package dump-package >/dev/null && swift test --jobs 2
+```
+
+- If `dump-package` still reports `PackageDescription.Package.__allocating_init`, capture that output; do not reinstall toolchains without further diagnosis. The specific manifest experiment failed.
+- If `dump-package` succeeds but tests fail in Swift source or XCTest assertions, those are **new concrete** failures to fix separately.
+- If `swift test` passes, record the exact test total and exit status, then run regression scripts again as appropriate before reviewing PR #5.
+- No GitHub Actions or Xcode reinstall are needed for this experiment. `--jobs 2` limits compiler parallelism.
+
+References: Swift proposal [SE-0441](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0441-formalize-language-mode-terminology.md) and SwiftPM [changelog](https://github.com/swiftlang/swift-package-manager/blob/main/CHANGELOG.md).
+
 ## Alternative direct-`swiftc` executable smoke test (CLT-only)
 
 The contributor's 2026-10-22 terminal result established:
