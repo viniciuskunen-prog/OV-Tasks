@@ -34,6 +34,7 @@ final class ClickUpConnectionStore: ObservableObject {
     @Published private(set) var metrics: DashboardMetrics?
     @Published private(set) var activities: [PreviewEvent] = []
     @Published private(set) var lastSuccessfulSync: Date?
+    @Published private(set) var unmappedStatusCount = 0
     @Published private(set) var isBusy = false
     @Published private(set) var message = "Nenhuma conta ClickUp conectada."
     @Published private(set) var errorMessage: String?
@@ -252,6 +253,7 @@ final class ClickUpConnectionStore: ObservableObject {
         activities = []
         eventLinks = [:]
         lastSuccessfulSync = nil
+        unmappedStatusCount = 0
         errorMessage = nil
         message = "\(lists.count) listas selecionadas. Use Sincronizar agora."
         Task { [weak self] in await self?.loadCachedData() }
@@ -276,12 +278,14 @@ final class ClickUpConnectionStore: ObservableObject {
             let calculated = try await db.metrics(scopes: scopes, now: Date())
             let rawEvents = try await db.recentEvents(limit: 500)
             var allowed = Set<TaskIdentity>()
+            var unknownByIdentity = Set<TaskIdentity>()
             var linkByIdentity: [TaskIdentity: URL] = [:]
             var latest: Date?
             for scope in scopes {
                 if let tasks = try await db.snapshot(for: scope) {
                     for task in tasks {
                         allowed.insert(task.identity)
+                        if task.status == .unknown { unknownByIdentity.insert(task.identity) }
                         linkByIdentity[task.identity] = task.validatedOriginalURL
                     }
                 }
@@ -304,6 +308,7 @@ final class ClickUpConnectionStore: ObservableObject {
             activities = mapped
             eventLinks = urls
             lastSuccessfulSync = latest
+            unmappedStatusCount = unknownByIdentity.count
         } catch {
             errorMessage = userMessage(error)
         }
@@ -389,6 +394,7 @@ final class ClickUpConnectionStore: ObservableObject {
             activities = []
             eventLinks = [:]
             lastSuccessfulSync = nil
+            unmappedStatusCount = 0
             message = "Conta desconectada. Cache e credencial local removidos."
         } catch {
             errorMessage = userMessage(error)
