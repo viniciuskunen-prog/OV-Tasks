@@ -1,6 +1,6 @@
 # M2.5 — bridge between M2 core and macOS preview
 
-**Status: source prepared in a stacked development branch. Native compilation, runtime QA and XCTest have not been performed for M2.5.**
+**Status (2026-10-22): direct-swiftc M2.5 integration smoke PASS, native macOS bundle compiled and launched, dark-mode Overview/Important screenshots reviewed successfully. M2 parent SwiftPM/XCTest suite remains blocked; this stacked PR is not ready to merge into main.**
 
 ## Why this milestone exists
 
@@ -35,7 +35,7 @@ zsh ./build.sh
 open ./build/OVTasks.app
 ```
 
-Expected **if successful**, not yet observed:
+Expected output, **actually observed on the contributor Mac**:
 
 ```text
 PASS: core-backed demo metrics 18 / 6 / 3 / 5 and four change events
@@ -43,7 +43,36 @@ PASS: adapter pagination + baseline, atomic preservation on failure, cursor loop
 RESULT: M2.5 standalone smoke PASS.
 ```
 
-The app should show a **M2.5 / fictitious data** label, four calculated numbers, recent simulated status/completion/due/assignment changes, filter working, and simulated links. Confirm the original Empty, Offline, Reconnect and Loading scenarios still work, and Quit functions. Do not claim UI was built or run until the actual Mac terminal and screenshots are supplied.
+The M2.5 application was compiled and opened successfully. Submitted screenshots confirm the new demo heading/footer and the four calculated totals, plus the filter reducing the four simulated events to three important ones. See the verification log below for remaining gaps.
+
+## Actual local verification — 2026-10-22
+
+Contributor terminal evidence (Apple Silicon macOS, Apple Swift 6.4):
+
+```text
+Compiling M2.5 provider contract and core-backed synthetic preview...
+Running real-core demo and provider pagination regression...
+PASS: core-backed demo metrics 18 / 6 / 3 / 5 and four change events
+PASS: adapter pagination + baseline, atomic preservation on failure, cursor loop detection
+RESULT: M2.5 standalone smoke PASS. SwiftPM/XCTest and SwiftUI app build remain separate pending checks.
+Building OV Tasks M2.5 (core-backed synthetic preview)...
+.../build/OVTasks.app/Contents/Info.plist: OK
+.../build/OVTasks.app: replacing existing signature
+Local preview created at: .../build/OVTasks.app
+```
+
+Initially, `open` reused the old running **M1** process; its screenshots showed `Protótipo M1`, the prior event feed and `3 fontes de demonstração`. This was *not* a core/compilation failure. After choosing **Sair** and reopening the newly built `build/OVTasks.app`, two new screenshots confirmed the M2.5 application was active:
+
+- **New version unmistakable:** header `Protótipo M2.5 · Dados fictícios`, footer `3 fontes simuladas · SQLite local`, and no real-sync claim.
+- **Dashboard:** 18 Pending, 6 In progress, 3 Overdue, 5 Completed, matching the core's tested generated snapshot.
+- **All activity:** four simulated changes exist: assignment (NanoTask), completion (ClickUp), due-date (Trello) and status (Trello). The last row is partially visible and accessible by scrolling; this is expected feed overflow.
+- **Important filter:** three remaining events — assignment, due-date, status. The completed event is excluded by the intentional `isImportant` rule.
+- **Visual review:** dark-mode panel, metrics and activity list legible; no visible heading collision or unintended overlap in supplied screenshots.
+
+**Evidence limits:** M2.5 light appearance, all five scenario switches, Settings link, demo task-link alert and Quit were **not retested for this build** (they passed in M1, which is a different binary). Larger accessibility text and keyboard/VoiceOver remain open (#3). The screenshots are evidence of UI binding to the generated demo fixture *in combination with the passing smoke code path*, not proof of real provider sync. The event timestamps near `10 seg` reflect synthetic events created on app launch, not source-reported times.
+
+**Result:** standalone integration smoke PASS; native compilation PASS; primary M2.5 dark-mode UI and filter smoke PASS. Parent M2 full `swift test` still blocked by mismatched local SwiftPM manifest link. No GitHub Actions or real API calls.
+
 
 ## Explicit non-goals / known risks
 
@@ -57,4 +86,4 @@ The app should show a **M2.5 / fictitious data** label, four calculated numbers,
 
 ## Acceptance
 
-The stacked PR remains a draft until both the direct runner and the macOS menu UI compile and the owner reviews the preview. M2's parent still needs its full QA gate or an explicitly revised documented one. No GitHub Actions used.
+The direct runner, native app build and primary dark-mode UI/filter validation have been observed and passed. **Keep this stacked PR draft** because its M2 parent #5 has not met the full SwiftPM/XCTest quality gate; PR #6 must not bypass that dependency. Repeat untested M2.5 scenarios and accessiblity checks before any public release. No GitHub Actions used.
