@@ -21,7 +21,18 @@ The local app bundle is **ad-hoc signed** by \`build.sh\`, not signed with a sta
 
 Production requirements still include OAuth secret exchange external to the open-source app, first-party status mapping, rigorous offline tests, live provider contract validation, per-account logout/backoff, stable signing/notarization, privacy review and keyboard/VoiceOver issue #3. This is a **developer preview**, not a stable release.
 
-## Local acceptance — not yet executed
+## First real Mac validation — 2026-10-22 (partial)
+
+User checked out `feat/m3b-clickup-connection-ui` and executed `swift test --jobs 2 && zsh ./test-m25-direct.sh && zsh ./build.sh` on the physical Mac.
+
+**Observed:**
+- Swift Package XCTest **17/17 passed (0 failures)**: ClickUpReadTests 4, DomainTests 9, StoreTests 4.
+- `test-m25-direct.sh` **PASS**, including synthetic metrics/events, pagination, cache preservation and repeated-cursor detection.
+- Native `build.sh` **FAILED** (the new M3B UI was not built). Compiler reported `Sources/OVTasksApp/ClickUp/ClickUpConnectionStore.swift:99:14: error: 'is' keyword required to pattern match against type name` for `case CancellationError:`.
+
+**Correction committed:** `3992d0e` changes the line to `case is CancellationError:`. This is a Swift pattern-match correction, not a change to provider behavior. **The corrected M3B native app has NOT been recompiled or tested yet.** It is possible subsequent compiler diagnostics will surface; report the entire new compiler output without supplying any ClickUp token. PR #8 remains draft and no real provider data has been accessed.
+
+## Local acceptance — rerun after correction
 
 \`\`\`zsh
 cd ~/Projects/OV-Tasks
