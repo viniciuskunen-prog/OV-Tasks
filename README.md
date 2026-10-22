@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status:** M1 native UI source available for local build and visual review. Not yet compiled/validated on a Mac in this project; no stable release or live integrations.
+> **Status:** M1 native preview built and visually reviewed on macOS in light and dark mode (2026-10-22); keyboard-only access remains a known issue to resolve before stable release. No stable release or live integrations.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
