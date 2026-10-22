@@ -97,6 +97,29 @@ xcrun swiftc -parse-as-library -typecheck -module-name OVTasksCore \
 
 This type-check is **not equivalent to running `swift test`** and provides no XCTest evidence. If developer tools need repair, use a compatible official Apple toolchain / CLT update process only after checking the installed versions and macOS release. Do not delete Command Line Tools blindly, disable security mechanisms, or introduce hosted GitHub Actions as a workaround.
 
+## Alternative direct-`swiftc` executable smoke test (CLT-only)
+
+The contributor's 2026-10-22 terminal result established:
+- `xcode-select -p`: `/Library/Developer/CommandLineTools`
+- `xcrun swift --version`: Apple Swift **6.4**, target arm64-apple-macosx27.0.0
+- `swift package --version`: Swift Package Manager 6.4.0-dev
+- Full Xcode not present in `/Applications/Xcode.app`
+- Direct `swiftc -parse-as-library -typecheck` of **all five `OVTasksCore` sources succeeded**.
+
+The `swift test` failure is therefore limited to SwiftPM's **manifest link stage** at this time. As a low-risk workaround, this branch adds `Tests/M2StandaloneSmoke.swift` and `test-m2-direct.sh`. The shell script compiles the *same core sources* with `xcrun swiftc -lsqlite3` and runs a **standalone synthetic-data regression binary**, bypassing the SwiftPM manifest.
+
+```zsh
+cd ~/Projects/OV-Tasks
+git fetch origin
+git switch feat/m2-domain-store
+git pull --ff-only
+zsh ./test-m2-direct.sh
+```
+
+It covers five groups: identifier/status mapping, DST/deadline/metrics, baseline-safe event diffs, poll scheduling, and SQLite atomic snapshot persistence/account isolation. The runner is an actual executable — it is **not merely type-checking** — but **it is not a substitute for the full XCTest suite**. If it passes, record the exact output and still keep the SwiftPM/XCTest issue as a separate tooling acceptance item. Until its first real run, the standalone smoke test itself is **unvalidated**.
+
+Avoid changing global toolchain selection or installing a second Xcode just to run this fallback. The compiled smoke executable remains under `.build/m2-direct-smoke/` and no data leaves the Mac.
+
 ## Tests included (NOT executed yet)
 
 - Composite ID safety (nil/empty/delimiter); explicit unmapped status UNKNOWN.
