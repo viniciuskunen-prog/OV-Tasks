@@ -17,7 +17,7 @@ struct PreviewSettingsView: View {
                     }
                 }
 
-                Text("Todos os nomes, contadores, mudanças e prazos são fictícios. Nenhum acesso externo é realizado.")
+                Text("Os dados continuam fictícios, mas os contadores e eventos agora são calculados pelo núcleo M2 e SQLite temporário. Nenhuma conexão externa é realizada.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -34,7 +34,7 @@ struct PreviewSettingsView: View {
             Section("Alertas planejados") {
                 Label("Notificações do macOS ainda não estão habilitadas.", systemImage: "bell.slash")
                     .foregroundStyle(.secondary)
-                Text("O estágio M1 é somente uma prévia visual. Não agenda notificações nem executa sincronização.")
+                Text("Este protótipo M2.5 não agenda notificações nem sincroniza contas reais.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
