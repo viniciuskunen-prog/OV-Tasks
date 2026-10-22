@@ -1,17 +1,19 @@
 # Implementation roadmap
 
-**Status:** planning. The milestones below are proposed sequencing, not completed features. No time estimates are implied.
+**Status:** M0 documentation completed; M1 SwiftUI source prepared but awaiting physical Mac compilation, visual approval and smoke tests. Later milestones remain planned. No time estimates are implied.
 
 | Milestone | Goal | Acceptance / exit criteria |
 | --- | --- | --- |
 | M0 — Documentation baseline | Public repo, developer docs and governance | README, architecture, provider contract, UI spec, security, contributing guide, no secrets |
-| M1 — Native shell | SwiftUI menu bar app with mocked states | Opens menu, popover stays compact, light/dark, Settings, keyboard/VoiceOver, synthetic fixtures only |
+| M1 — Native shell (source prepared, QA pending) | SwiftUI menu bar app with mocked states | Confirm local build; opens menu, popover stays compact, light/dark, Settings, keyboard/VoiceOver, synthetic fixtures only |
 | M2 — Domain engine | Store, normalizer, counters, diff, scheduler | Unit tests for status maps, deadlines, duplicate event handling, baseline import, migrations |
 | M3 — ClickUp | First end-to-end provider integration | Authorized scoped tasks, pagination, read-only mapping and links; secrets never in bundle; auth release path documented |
 | M4 — Trello | Board/card synchronization | Per-board status mapping, due behavior, scoped connection and links; quota tests |
 | M5 — NanoTask | Authenticated least-privilege client | Dedicated API contract, RLS/isolation tests, no publication of private NanoTask internals |
 | M6 — Notifications and hardening | Event notifications and trust | Quiet hours, dedup after relaunch, offline/wake, account revocation, local data deletion, accessibility |
 | M7 — v1 public release | Release-quality macOS package | Signing/notarization strategy, checksum, reproducible documented local build, smoke on clean Mac, changelog, LICENSE, privacy notice |
+
+See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for local build commands, scenario controls, visual verification and known limitations.
 
 ## M0 exit caveat
 Publishing the documentation alone is **not** a product release and does not validate third-party API behavior. Choose an open-source license and verify brand assets before distributing binaries or claiming permitted software reuse.
