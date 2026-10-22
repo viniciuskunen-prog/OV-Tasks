@@ -30,11 +30,27 @@ public protocol ClickUpHTTPTransport: Sendable {
     func get(_ request: URLRequest) async throws -> ClickUpHTTPResult
 }
 
+// Authorization must never be forwarded to an unexpected host after a redirect.
+private final class ClickUpRejectRedirects: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(_ session: URLSession, task: URLSessionTask,
+                    willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(nil)
+    }
+}
+
 public struct ClickUpURLSessionTransport: ClickUpHTTPTransport {
     private let session: URLSession
 
-    public init(session: URLSession = .shared) {
-        self.session = session
+    public init() {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.httpCookieStorage = nil
+        configuration.urlCredentialStorage = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        session = URLSession(configuration: configuration,
+                             delegate: ClickUpRejectRedirects(),
+                             delegateQueue: nil)
     }
 
     public func get(_ request: URLRequest) async throws -> ClickUpHTTPResult {
@@ -319,14 +335,12 @@ public struct ClickUpListAdapter: ProviderAdapter {
             let rawStatus = task.status.status
             let explicit = statusMapping.status(for: rawStatus)
             let status: TaskStatus
-            if explicit != .unknown {
-                status = explicit
-            } else {
-                switch task.status.type.lowercased() {
-                case "closed", "done": status = .done
-                case "open": status = .open
-                default: status = .unknown // Never infer progress from an arbitrary custom label.
-                }
+            // Terminal provider category takes priority: no optional name mapping
+            // may turn an explicitly completed task back into an open task.
+            switch task.status.type.lowercased() {
+            case "closed", "done": status = .done
+            case "open": status = explicit == .unknown ? .open : explicit
+            default: status = explicit // Unknown remains unknown without explicit mapping.
             }
 
             let deadline: TaskDeadline?
