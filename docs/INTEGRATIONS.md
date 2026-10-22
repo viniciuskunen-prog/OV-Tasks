@@ -1,6 +1,6 @@
 # Integrations, authentication and capabilities
 
-**Status: planned official adapters; not yet functional in OV Tasks.** Review provider documentation and policies at implementation time.
+**Status (2026-10-22):** M3A ClickUp GET-only transport, normalized paginated adapter and macOS Keychain store have passed compilation and synthetic XCTest on the contributor's Mac (17 total package tests, 0 failures). No connection UI or authorized real sync is wired to the app yet. Trello/NanoTask adapters remain planned.
 
 ## Shared contract
 Each account is independently authorized and limited to selected workspaces/boards. Connector returns normalized task snapshots/events and capability flags. If comments/events/completion timestamps are unavailable, explicitly report unsupported rather than filling in guesses. Tokens are stored in macOS Keychain. **ChatGPT connector credentials are not available to the app and must never be copied into it.**
@@ -15,6 +15,8 @@ Each account is independently authorized and limited to selected workspaces/boar
 ClickUp documents personal API tokens for individual use and OAuth 2.0 Authorization Code for integrations distributed to users. Token exchange uses a **client secret**; it must not be embedded in an open-source macOS bundle. A secure, optional token-exchange backend is one route for frictionless OAuth. A user-supplied individual token may serve a local-first fallback if provider terms permit.
 
 V1 adapter target: list authorized workspaces/lists; fetch paginated tasks with changed timestamps where possible; map arbitrary status categories; link to task URL; track due and completion signals only when confirmed. Handle account-level scopes, pagination and quota. No write API in v1.
+
+**Current M3A source:** `ClickUpReadClient` supports authorized identity and hierarchy discovery, typed GET-only HTTP, complete-scope list pagination and conservative status/date mapping. `ClickUpKeychain` stores individual tokens separately from SQLite. This code passed synthetic XCTest and cannot currently be used in the Settings UI; see [M3A acceptance](M3_CLICKUP_FOUNDATION.md). User-supplied personal tokens still carry whatever permissions the ClickUp account grants; the read-only constraint is enforced by *our client methods*, not by narrowing the underlying token's permissions. Public OAuth requires an external confidential token-exchange mechanism, so no client secret is embedded.
 
 Official references:
 - https://developer.clickup.com/docs/authentication

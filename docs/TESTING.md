@@ -10,6 +10,10 @@ The contributor ran `zsh ./test-m25-direct.sh` on a physical Mac: synthetic core
 
 With Xcode 27.1 installed, the contributor ran `swift test --jobs 2` twice on physical Apple Silicon macOS. Native XCTest: 9 DomainTests + 4 StoreTests, **13 tests passed, 0 failures**, shell exit code **0**. The separate Swift Testing runner showed zero tests because the project uses XCTest. M2 additionally passed five direct-swiftc regression groups; PR #5 has been merged into `main`. See [M2_CORE.md](M2_CORE.md) for exact QA evidence.
 
+## M3A ClickUp foundation — XCTest PASSED 2026-10-22
+
+Four new synthetic XCTest methods in `ClickUpReadTests.swift` passed on the user's physical Mac with Xcode 27.1: read-only identity/discovery, status/date/link normalization, fully paged ingestion with HTTP 429 preserving the SQLite snapshot, and unknown status/scope/cursor rejection. Full package XCTest **17 passed, 0 failures** (4 ClickUp, 9 Domain, 4 Store); separate M2.5 smoke script passed and demo macOS app compiled. **No live ClickUp requests, no Keychain credential roundtrip through a signed app, and no ClickUp UI integration tested.** See [M3A guide](M3_CLICKUP_FOUNDATION.md).
+
 ## Test matrix
 | Area | Cases |
 | --- | --- |
