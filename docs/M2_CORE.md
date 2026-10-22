@@ -1,6 +1,6 @@
 # M2 — Domain engine and local snapshot cache
 
-**Status (2026-10-22): all five OVTasksCore source files typechecked and the direct Swift compiler regression binary compiled and passed its five groups on an Apple Silicon Mac. The separate SwiftPM/XCTest suite is still blocked during Package.swift manifest linking and has not run. This is partial, not full, M2 acceptance.**
+**Status (2026-10-22): M2 core acceptance PASS. Physical Mac: five direct-swiftc smoke groups PASS, and full native XCTest suite PASS — 13 tests (9 DomainTests + 4 StoreTests), zero failures and exit code 0. Xcode 27.1 resolved the earlier CLT-only manifest/toolchain blocker. No live provider integration or stable release.**
 
 ## Scope implemented in code
 
@@ -246,8 +246,41 @@ Direct Swift smoke checks succeeded. XCTest / 'swift test' remains pending.
 - The 7-day window uses **168 hours**, not seven local calendar midnights, as specified in docs/DATA_MODEL.md.
 - Keyboard-only navigation in the M1 UI remains a separate pre-release accessibility debt: issue #3.
 
+## Actual XCTest acceptance — 2026-10-22
+
+On a physical Apple Silicon Mac running macOS 27.0.1, the contributor installed **Xcode 27.1 (build 27A9275)**. The first invocation required Apple SDK license acceptance. After setup, `swift test --jobs 2` completed and a second identical run captured the entire output in `/tmp/ovtasks-m2-tests.log`.
+
+**Exact observed summary of the second run:**
+
+```text
+Test Suite 'DomainTests' passed.
+    Executed 9 tests, with 0 failures (0 unexpected)
+Test Suite 'StoreTests' passed.
+    Executed 4 tests, with 0 failures (0 unexpected)
+Test Suite 'OVTasksCoreTests.xctest' passed.
+    Executed 13 tests, with 0 failures (0 unexpected)
+Test Suite 'All tests' passed.
+    Executed 13 tests, with 0 failures (0 unexpected)
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+Código de saída: 0
+```
+
+The `0 tests in 0 suites` line is the separate **Swift Testing** runner; it does not contradict the 13 **XCTest** tests reported immediately above. This was an actual completed local run, not a simulated or inferred success.
+
+```zsh
+cd ~/Projects/OV-Tasks
+git switch feat/m2-domain-store
+swift test --jobs 2
+```
+
+For a subsequent portable invocation without depending on global developer-tool selection, use `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2`.
+
+**Resolution:** the previous 3/3 failed minimal SwiftPM package probes were performed using the macOS Command Line Tools 27.0's SwiftPM runtime. After installation/configuration of full Xcode 27.1, the package built and XCTest executed. This validates the *M2 test suite*, not any hypothesis about exactly which CLT library symbol was missing. Leave the historic diagnostics below for reproducibility; they represent the earlier toolchain state and are no longer current blockers.
+
+**Remaining release gaps:** M2 is a backend core milestone, not the complete app; provider API authentication, background scheduling, notification delivery, UI accessibility (#3), and full public packaging remain future acceptance requirements.
+
 ## Acceptance for M2
 
-`swift test` must pass locally and its result must be recorded. Any compiler or test errors are blockers for M2. A small data-flow demo linking M1's UI to persisted summaries is **not required** for this core milestone; real UI binding will be integrated in the first provider milestone or a dedicated subsequent PR, with clear connection states.
+**ACCEPTED for M2:** full local `swift test --jobs 2` passed (13 XCTest, zero failures, exit code 0) and is recorded above, alongside five passing independent smoke groups. The M2.5 child PR implements the separate synthetic UI bridge and will be integrated on its own review/QA gate. Provider APIs, credentials and live sync remain unimplemented.
 
 No GitHub Actions are configured or executed for this milestone.
