@@ -176,6 +176,10 @@ struct DashboardView: View {
                 banner(symbol: "exclamationmark.triangle", message: error)
             } else if clickUp.isConnected && !clickUp.hasSelectedLists {
                 banner(symbol: "list.bullet", message: "Selecione listas nas configurações para acompanhar tarefas reais.")
+            } else if clickUp.isConnected && clickUp.unmappedStatusCount > 0 {
+                banner(symbol: "questionmark.circle", message: "\(clickUp.unmappedStatusCount) tarefas com status personalizado sem mapeamento. Os totais podem estar incompletos.")
+            } else if clickUp.isConnected && clickUp.metrics?.completedIsComplete == false {
+                banner(symbol: "info.circle", message: "Algumas tarefas concluídas não possuem data confiável. A contagem de 7 dias pode estar incompleta.")
             } else if !clickUp.isConnected && preview.demoFailure != nil {
                 banner(symbol: "exclamationmark.triangle", message: "Não foi possível calcular os dados de demonstração.")
             } else if !clickUp.isConnected && preview.scenario == .offline {
