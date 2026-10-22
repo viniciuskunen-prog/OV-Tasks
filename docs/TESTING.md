@@ -2,6 +2,10 @@
 
 **M1 local compilation and selected smoke tests completed on 2026-10-22; keyboard navigation failed and extended accessibility verification remains open.** This document describes future gates; see [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for evidence and remaining checks.
 
+## M2 tests awaiting execution
+
+The M2 branch adds Swift Package unit tests at `Tests/OVTasksCoreTests`. Run `swift test` locally from the repo root after checking out `feat/m2-domain-store`. Tests cover scoped metrics, DST, silent baseline, deduplicated repeated polls, SQL durability, account isolation, snapshot validation and pure rate-limit scheduling. No tests for this branch have actually been executed yet. Report the exact command output before accepting M2. See [M2_CORE.md](M2_CORE.md).
+
 ## Test matrix
 | Area | Cases |
 | --- | --- |
