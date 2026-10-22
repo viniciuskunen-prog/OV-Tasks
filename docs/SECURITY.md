@@ -1,6 +1,6 @@
 # Security and privacy model
 
-**Status (2026-10-22):** M3A development branch adds a macOS Keychain token store and pinned read-only ClickUp client compiled under XCTest; a live Keychain credential roundtrip and real network integration remain **untested**. Security audit, live connection review and release controls remain mandatory.
+**Status (2026-10-22):** M3A Keychain and pinned read-only transport compiled and passed synthetic XCTest; M3B now adds an **unverified native token-entry flow and persistent local cache**. Actual Keychain roundtrip, live network request, disconnect behavior and stable code-signing remain **untested**. Security audit, live connection review and release controls remain mandatory.
 
 ## Principles
 Local-first, read-only, least privilege, transparent source selection and data minimization. This public repository **must not contain secrets, real task data, private customer information, personal access links or internal operational history**.
@@ -11,7 +11,7 @@ Never commit or paste into GitHub, issues, PRs, app logs, design documents or a 
 - API keys with privileged access, passwords, session cookies
 - NanoTask Supabase service-role key, private database URLs, SSH keys or personal tokens
 
-Runtime provider credentials must live in **macOS Keychain**, not UserDefaults, plaintext files, a spreadsheet, Google Docs or chat history. M3A contains a per-account Keychain implementation that must be verified with real app signing/access before actual tokens are accepted. Hosted confidential OAuth or webhook endpoints, if introduced later, use a managed secrets store/secret environment, rotation and strict per-service authorization. The private operator checkpoint may describe **credential name/reference, owner, account, scope, expiration or where it is kept**, but **never the credential value**.
+Runtime provider credentials must live in **macOS Keychain**, not UserDefaults, plaintext files, a spreadsheet, Google Docs or chat history. M3B's local UserDefaults metadata includes only account/list IDs and visible labels, never the personal token. M3A contains a per-account Keychain implementation that must be verified with real app signing/access before actual tokens are accepted. Hosted confidential OAuth or webhook endpoints, if introduced later, use a managed secrets store/secret environment, rotation and strict per-service authorization. The private operator checkpoint may describe **credential name/reference, owner, account, scope, expiration or where it is kept**, but **never the credential value**.
 
 If a secret is exposed, revoke/rotate it, remove unauthorized storage, assess any access and record an incident without pasting the secret again. Git history removal alone is not a substitute for rotation.
 
