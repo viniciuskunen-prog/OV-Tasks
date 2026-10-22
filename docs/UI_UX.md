@@ -25,9 +25,9 @@ Keyboard navigation; focus ring; VoiceOver labels; reduced motion; dynamic text 
 ## Design language
 Minimal utility-oriented macOS UI. Prefer native materials, SF Symbols, restrained status use, spacing and typography consistent with macOS. No requirement to duplicate task platform colors or GimbalBar layout. User visual approval is a gate before connecting real accounts.
 
-## M2.5 source state (pending Mac validation)
+## M2.5 synthetic UI — validated dark-mode overview/filter on Mac
 
-M2.5 replaces **hard-coded overview numbers/feed events** with values computed from synthetic `TaskSummary` and `ChangeEvent` through the real M2 core and temporary SQLite. The existing five scenarios and demo-only link dialogs remain. A loading or error state must never imply a connected provider. No screenshots of the M2.5 build have been validated yet. See [M2.5 verification](M25_PREVIEW_BRIDGE.md).
+M2.5 replaces **hard-coded overview numbers/feed events** with values computed from synthetic `TaskSummary` and `ChangeEvent` through the real M2 core and temporary SQLite. The original five preview scenarios and demo-only link dialogs remain in code. A loading or error state must never imply a connected provider. On 2026-10-22, real Mac screenshots confirmed the M2.5 label, computed counters, four synthetic events and Important filter (three events); the native build and synthetic smoke passed. **Not retested on M2.5:** light appearance, all individual preview scenarios, Settings link/dialogs and keyboard/VoiceOver. See [M2.5 verification](M25_PREVIEW_BRIDGE.md).
 
 ## Current prototype
 
