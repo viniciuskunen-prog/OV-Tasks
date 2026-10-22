@@ -41,7 +41,7 @@ struct CoreSmokeRunner {
 
     private static func task(
         _ id: String,
-        scope: WatchedScope = scope(),
+        scope: WatchedScope = WatchedScope(providerID: "trello", accountID: "smoke-a", scopeID: "board"),
         status: TaskStatus = .open,
         deadline: TaskDeadline? = nil,
         completedAt: Date? = nil,
