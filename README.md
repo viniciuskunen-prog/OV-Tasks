@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status:** M1 native preview validated on macOS; M2 domain engine and SQLite cache implemented as source on a separate branch, **pending local Swift Package tests**. No stable release or live integrations.
+> **Status (2026-10-22):** M1 native preview validated; M2 domain/SQLite core passed 13 native XCTest cases (0 failures) and five independent local regression groups. M2.5 synthetic UI bridge validated in a stacked draft PR, pending integration. No stable public release or live provider connections.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
