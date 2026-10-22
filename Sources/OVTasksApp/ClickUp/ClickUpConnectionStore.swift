@@ -311,6 +311,10 @@ final class ClickUpConnectionStore: ObservableObject {
 
     func taskURL(for eventID: String) -> URL? { eventLinks[eventID] }
 
+    func reportMissingTaskLink() {
+        errorMessage = "Esta tarefa não possui um link ClickUp seguro disponível."
+    }
+
     func synchronize() async {
         guard !isBusy, let saved = connection, !saved.lists.isEmpty else {
             errorMessage = "Selecione e salve ao menos uma lista antes de sincronizar."
