@@ -10,7 +10,7 @@ struct PreviewSettingsView: View {
         Form {
             Section("ClickUp · Conexão local") {
                 if let connected = clickUp.connection {
-                    Label("Conectado: \(connected.displayName)", systemImage: "checkmark.shield")
+                    Label("Conta configurada: \(connected.displayName)", systemImage: "person.crop.circle.badge.checkmark")
                     Text("Acesso somente de leitura pelo OV Tasks. A credencial permanece no Chaves deste Mac.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
