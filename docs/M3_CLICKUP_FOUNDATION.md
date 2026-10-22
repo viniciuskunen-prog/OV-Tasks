@@ -1,6 +1,6 @@
-# M3A — ClickUp read-only foundation (developer candidate)
+# M3A — ClickUp read-only foundation (accepted development milestone)
 
-**Status 2026-10-22: local core QA PASSED.** Contributor's physical Mac (Xcode 27.1) compiled and ran the package: **17 XCTest methods passed (4 ClickUp, 9 Domain, 4 Store), zero failures**. Separately, M2.5 direct integration smoke and the existing macOS preview build passed. **No real ClickUp account connected and no live sync performed**; M3A remains the tested connector foundation, not an end-to-end feature.
+**Status 2026-10-22: local core QA PASSED, PR #7 MERGED to `main` at `bad835bf2030e717a87f072ed31f8a2247c3a1c1`.** Contributor's physical Mac (Xcode 27.1) compiled and ran the package: **17 XCTest methods passed (4 ClickUp, 9 Domain, 4 Store), zero failures**. Separately, M2.5 direct integration smoke and the existing macOS preview build passed. **No real ClickUp account connected and no live sync performed**; M3A remains the tested connector foundation, not an end-to-end feature.
 
 ## Scope and official API verification
 
