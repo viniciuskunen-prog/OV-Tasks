@@ -1,6 +1,6 @@
 # Implementation roadmap
 
-**Status (2026-10-22):** M0/M1 accepted. M2 core passed native XCTest 13/13, zero failures and was merged to `main` as PR #5. M2.5 synthetic UI bridge/provider pagination passed real Mac smoke, native build and dark-mode visual/filter QA; PR #6 has been merged into `main` as the M2.5 development milestone. M3+ real providers remain planned; keyboard accessibility #3 remains a public-release blocker.
+**Status (2026-10-22):** M0/M1 accepted. M2 core passed native XCTest 13/13, zero failures and was merged to `main` as PR #5. M2.5 synthetic UI bridge/provider pagination passed real Mac smoke, native build and dark-mode visual/filter QA; PR #6 has been merged into `main` as the M2.5 development milestone. M3A ClickUp read-only transport/Keychain foundation exists in an unverified branch, without any connected account; M3B must still implement the actual UI and authorized sync. Keyboard accessibility #3 remains a public-release blocker.
 
 | Milestone | Goal | Acceptance / exit criteria |
 | --- | --- | --- |
@@ -8,7 +8,7 @@
 | M1 — Native shell (accepted with keyboard access debt) | SwiftUI menu bar app with mocked states | Physical Mac build, popover/theme/settings, scenario persistence, demo link dialog, Quit verified; keyboard/VoiceOver reserved for mandatory pre-release QA (#3) |
 | M2 — Domain engine (accepted/merged PR #5) | Normalized models, counters, diff, SQLite cache, poll planning | Local `swift test` passes, baseline/duplicate/DST/account-isolation tests pass; M2 is core-only (no live scheduler or UI data binding) |
 | M2.5 — UI core bridge (QA passed, merged PR #6) | Core-computed synthetic counters/feed plus typed complete-scope provider ingestion | Mac compile + demo screenshot, pagination/failure smoke; absolutely no real account access |
-| M3 — ClickUp | First end-to-end provider integration | Authorized scoped tasks, pagination, read-only mapping and links; secrets never in bundle; auth release path documented |
+| M3 — ClickUp (M3A source pending Mac QA) | First end-to-end provider integration | M3A API/Keychain unit tests; M3B secure account connect, explicit List selection, real paginated read-only sync, disconnect; no OAuth client secret in the bundle |
 | M4 — Trello | Board/card synchronization | Per-board status mapping, due behavior, scoped connection and links; quota tests |
 | M5 — NanoTask | Authenticated least-privilege client | Dedicated API contract, RLS/isolation tests, no publication of private NanoTask internals |
 | M6 — Notifications and hardening | Event notifications and trust | Quiet hours, dedup after relaunch, offline/wake, account revocation, local data deletion, accessibility |
