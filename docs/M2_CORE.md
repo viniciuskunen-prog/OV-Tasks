@@ -1,6 +1,6 @@
 # M2 — Domain engine and local snapshot cache
 
-**Status (2026-10-22): all five OVTasksCore source files typechecked and the direct Swift compiler regression binary compiled and passed its five groups on an Apple Silicon Mac. The separate SwiftPM/XCTest suite is still blocked during Package.swift manifest linking and has not run. This is partial, not full, M2 acceptance.**
+**Status (2026-10-22): M2 core acceptance PASS. Physical Mac: five direct-swiftc smoke groups PASS, and full native XCTest suite PASS — 13 tests (9 DomainTests + 4 StoreTests), zero failures and exit code 0. Xcode 27.1 resolved the earlier CLT-only manifest/toolchain blocker. No live provider integration or stable release.**
 
 ## Scope implemented in code
 
@@ -97,6 +97,93 @@ xcrun swiftc -parse-as-library -typecheck -module-name OVTasksCore \
 
 This type-check is **not equivalent to running `swift test`** and provides no XCTest evidence. If developer tools need repair, use a compatible official Apple toolchain / CLT update process only after checking the installed versions and macOS release. Do not delete Command Line Tools blindly, disable security mechanisms, or introduce hosted GitHub Actions as a workaround.
 
+## SwiftPM manifest experiment outcome and isolated diagnosis — 2026-10-22
+
+An attempted compatibility change to `// swift-tools-version: 6.0` plus `swiftLanguageModes: [.v5]` **failed** on the contributor's Command Line Tools. After checking out the updated parent M2 branch, the real `swift package dump-package` output was:
+
+```text
+Package.swift:24:25: error: extra argument 'swiftLanguageModes' in call
+Package.swift:24:27: error: reference to member 'v5' cannot be resolved without a contextual type
+error: invalid manifests
+```
+
+No XCTest code was compiled. Although current PackageDescription documentation describes `swiftLanguageModes`, the local SwiftPM 6.4-dev/Command Line Tools manifest interface did not recognize it. The experimental manifest edit was **reverted** to the original portable tools version 5.9. Its older manifest still fails to link a `PackageDescription.Package` initializer on this Mac.
+
+To distinguish a broken toolchain from a particular initializer ABI mismatch, the parent M2 branch now includes `diagnose-swiftpm.sh`. It creates three **disposable, minimal** packages in `${TMPDIR}`: a Swift Tools 5.9 minimal package, an explicitly older 5.9 constructor overload, and a Swift Tools 6.0 minimal package. It runs `swift package dump-package` on each and summarizes independent failures. The script does not alter the OV Tasks source tree, `xcode-select`, any global developer tools or the installed app. It also reports whether a native `xctest` runner is available.
+
+```zsh
+cd ~/Projects/OV-Tasks
+git fetch origin
+git switch feat/m2-domain-store
+git pull --ff-only
+zsh ./diagnose-swiftpm.sh
+```
+
+**Isolated diagnostic ACTUALLY RAN twice on 2026-10-22 and failed independently of OV Tasks:**
+
+```text
+Developer directory: /Library/Developer/CommandLineTools
+Apple Swift 6.4 (swiftlang-6.4.0.34.1), arm64-apple-macosx27.0.0
+Swift Package Manager - Swift 6.4.0-dev
+Native xctest runner: not found with active developer tools
+FAIL: tools59-minimal — manifest failed without any OV Tasks source
+FAIL: tools59-legacy-overload — manifest failed without any OV Tasks source
+FAIL: tools60-minimal — manifest failed without any OV Tasks source
+Diagnostic complete: 0 passed; 3 failed.
+```
+
+All three manifest link failures name the same unavailable `PackageDescription.Package.__allocating_init(... swiftLanguageVersions: ...)` symbol. Even the independent `Package(name: "Probe", targets: ...)` SwiftPM minimal package fails, so **the failure is proven independent of the repository's source and particular manifest options**. This strongly suggests that the current local Command Line Tools installation has an incompatible Swift compiler/PackageDescription runtime or a related packaging issue. **The exact mismatched component has not yet been proven.**
+
+The current active tools do not expose `xctest` using `xcrun --find xctest`. This adds another reason not to claim that XCTest could run on this specific setup even after the manifest is fixed. It does not by itself prove that all Command Line Tools installations lack XCTest.
+
+### Safe next step — inventory official tools updates (no changes)
+
+```zsh
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
+softwareupdate --list
+```
+
+These commands report the currently installed Command Line Tools package receipt and any Apple-supported updates available for that Mac; they do not install or uninstall anything. Apple recommends checking for a Command Line Tools version compatible with the macOS release and using Software Update or the official Apple Developer downloads. See [Apple: Installing the command-line tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools).
+
+**Actual inventory on the contributor Mac (2026-10-22):**
+
+```text
+package-id: com.apple.pkg.CLTools_Executables
+version: 27.0.0.0.1788430756
+Software Update Tool
+Finding available software
+No new software available.
+```
+
+No update is offered through `softwareupdate`. This does not prove that a separately downloadable Command Line Tools installer is unavailable on Apple Developer Downloads.
+
+**Recommended lower-risk way to isolate the broken CLI installation:** use a separate **stable full Xcode 27.1** bundle (released 2026-10-15), if disk space allows. The [Apple Xcode system requirements](https://developer.apple.com/xcode/system-requirements) list Xcode 27.1 as compatible with macOS Tahoe 26.6 or later, Swift 6.4 and macOS 27 SDKs; first check the real host system version with `sw_vers -productVersion`. Apple links: [stable Xcode 27.1 release](https://developer.apple.com/news/releases/?id=10152026a), [official Apple developer downloads](https://developer.apple.com/download/all/), or [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?mt=12). Prefer the stable 27.1 release over the separate 27.2 RC for this project. **The user has not installed this Xcode as part of our tests.**
+
+After installing and opening Xcode once to finish first-launch components/licenses, run the checks below with a **per-command developer directory override**. This keeps the global `xcode-select -p` pointing at CLT, avoiding changes to other projects:
+
+```zsh
+sw_vers -productVersion
+df -h /Applications
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcodebuild -version
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/xcrun --find xctest
+
+cd ~/Projects/OV-Tasks
+git fetch origin
+git switch feat/m2-domain-store
+git pull --ff-only
+
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift package dump-package >/dev/null && \
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2
+```
+
+These commands are **future instructions, not completed test results**. If SwiftPM fails with Xcode's toolchain too, inspect it separately; do not assume installation guarantees success. If disk space prevents a full Xcode installation, compare Apple's officially available `Command Line Tools for Xcode 27.1` or compatible package **only if such a download is actually listed**, but note that installing CLT packages replaces the single system-wide CLT installation and could affect other work. Avoid `sudo rm -rf /Library/Developer/CommandLineTools` unless intentionally following an approved repair plan.
+
+
+
+After repairing the toolchain, rerun `zsh ./diagnose-swiftpm.sh`. Only after a minimal probe passes should we retry `swift test --jobs 2` and then resolve any XCTest compilation/logic failures separately. The M2 five-group runtime smoke and M2.5 demo/UI smoke already **passed** with direct `swiftc` and remain valid for their tested scenarios.
+
+**Acceptance:** parent PR #5 and stacked PR #6 remain drafts. No GitHub Actions run; don't alter project code to accommodate a demonstrably failing global PackageDescription installation.
+
 ## Alternative direct-`swiftc` executable smoke test (CLT-only)
 
 The contributor's 2026-10-22 terminal result established:
@@ -159,8 +246,41 @@ Direct Swift smoke checks succeeded. XCTest / 'swift test' remains pending.
 - The 7-day window uses **168 hours**, not seven local calendar midnights, as specified in docs/DATA_MODEL.md.
 - Keyboard-only navigation in the M1 UI remains a separate pre-release accessibility debt: issue #3.
 
+## Actual XCTest acceptance — 2026-10-22
+
+On a physical Apple Silicon Mac running macOS 27.0.1, the contributor installed **Xcode 27.1 (build 27A9275)**. The first invocation required Apple SDK license acceptance. After setup, `swift test --jobs 2` completed and a second identical run captured the entire output in `/tmp/ovtasks-m2-tests.log`.
+
+**Exact observed summary of the second run:**
+
+```text
+Test Suite 'DomainTests' passed.
+    Executed 9 tests, with 0 failures (0 unexpected)
+Test Suite 'StoreTests' passed.
+    Executed 4 tests, with 0 failures (0 unexpected)
+Test Suite 'OVTasksCoreTests.xctest' passed.
+    Executed 13 tests, with 0 failures (0 unexpected)
+Test Suite 'All tests' passed.
+    Executed 13 tests, with 0 failures (0 unexpected)
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+Código de saída: 0
+```
+
+The `0 tests in 0 suites` line is the separate **Swift Testing** runner; it does not contradict the 13 **XCTest** tests reported immediately above. This was an actual completed local run, not a simulated or inferred success.
+
+```zsh
+cd ~/Projects/OV-Tasks
+git switch feat/m2-domain-store
+swift test --jobs 2
+```
+
+For a subsequent portable invocation without depending on global developer-tool selection, use `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2`.
+
+**Resolution:** the previous 3/3 failed minimal SwiftPM package probes were performed using the macOS Command Line Tools 27.0's SwiftPM runtime. After installation/configuration of full Xcode 27.1, the package built and XCTest executed. This validates the *M2 test suite*, not any hypothesis about exactly which CLT library symbol was missing. Leave the historic diagnostics below for reproducibility; they represent the earlier toolchain state and are no longer current blockers.
+
+**Remaining release gaps:** M2 is a backend core milestone, not the complete app; provider API authentication, background scheduling, notification delivery, UI accessibility (#3), and full public packaging remain future acceptance requirements.
+
 ## Acceptance for M2
 
-`swift test` must pass locally and its result must be recorded. Any compiler or test errors are blockers for M2. A small data-flow demo linking M1's UI to persisted summaries is **not required** for this core milestone; real UI binding will be integrated in the first provider milestone or a dedicated subsequent PR, with clear connection states.
+**ACCEPTED for M2:** full local `swift test --jobs 2` passed (13 XCTest, zero failures, exit code 0) and is recorded above, alongside five passing independent smoke groups. The M2.5 child PR implements the separate synthetic UI bridge and will be integrated on its own review/QA gate. Provider APIs, credentials and live sync remain unimplemented.
 
 No GitHub Actions are configured or executed for this milestone.
