@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status (2026-10-22): M1 app shell validated; M2 core passed native XCTest 13/13, zero failures, and is merged in `main`. M2.5 synthetic SwiftUI/SQLite bridge and typed paging contract passed local Mac integration smoke and dark-mode visual QA and are under final PR #6 review. No live providers or notifications exist.**
+**Status (2026-10-22): M1 app shell validated; M2 core passed native XCTest 13/13, zero failures, and is merged in `main`. M2.5 synthetic SwiftUI/SQLite bridge and typed paging contract passed local Mac integration smoke and dark-mode visual QA and were integrated into `main` through merged PR #6. No live providers or notifications exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
@@ -44,7 +44,7 @@ The M1 SwiftUI files remain under `Sources/OVTasksApp`. The M2 milestone impleme
 
 ## M2.5 development bridge
 
-The M2.5 branch introduces `CoreDemoFactory` (random temporary SQLite populated only with synthetic tasks), `PreviewStore` asynchronous loading and adapters for rendering `DashboardMetrics`/`ChangeEvent` in the existing SwiftUI popover. It also adds `ProviderAdapter` + `SnapshotIngestor`, a typed pagination collector that refuses partial commits. The integration smoke and native build passed on the contributor's Mac, and dark-mode dashboard/filter screenshots were reviewed. This is **not** a live provider client. See [M2.5 preview](M25_PREVIEW_BRIDGE.md) and [provider contract](PROVIDER_CONTRACT.md).
+The merged M2.5 milestone introduces `CoreDemoFactory` (random temporary SQLite populated only with synthetic tasks), `PreviewStore` asynchronous loading and adapters for rendering `DashboardMetrics`/`ChangeEvent` in the existing SwiftUI popover. It also adds `ProviderAdapter` + `SnapshotIngestor`, a typed pagination collector that refuses partial commits. The integration smoke and native build passed on the contributor's Mac, and dark-mode dashboard/filter screenshots were reviewed. This is **not** a live provider client. See [M2.5 preview](M25_PREVIEW_BRIDGE.md) and [provider contract](PROVIDER_CONTRACT.md).
 
 ## Data flow
 1. User authorizes a provider; token/refresh material goes to Keychain only.
