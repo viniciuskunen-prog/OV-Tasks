@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status (2026-10-22):** M1 menu bar preview validated; M2 normalized domain and SQLite core merged into `main` after **13 XCTest tests (0 failures)** and five standalone smoke groups. M2.5 synthetic core-backed UI and provider ingestion passed local integration smoke, macOS compilation and dark-mode visual/filter QA; PR #6 **merged into `main`** (M2.5 synthetic UI milestone accepted). No live integrations or stable release.
+> **Status (2026-10-22):** M1/M2/M2.5 development milestones integrated; 13 native M2 XCTest tests and M2.5 simulated macOS UI/adapter smoke previously passed. A separate M3A branch now contains **uncompiled, untested** ClickUp API read-only foundation and Keychain storage. **No real provider connection in the app** and no stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -34,6 +34,7 @@ The accepted M2 core (`OVTasksCore`) is a Swift Package with normalized models, 
 - [M1 native interface preview / build / visual QA](docs/M1_PROTOTYPE.md)
 - [M2 core, local persistence and Swift test guide](docs/M2_CORE.md)
 - [M2.5 synthetic core/UI bridge and provider tests](docs/M25_PREVIEW_BRIDGE.md)
+- [M3A ClickUp foundation, API boundaries and Mac test gate](docs/M3_CLICKUP_FOUNDATION.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)
