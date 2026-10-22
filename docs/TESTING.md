@@ -10,6 +10,10 @@ The contributor ran `zsh ./test-m25-direct.sh` on a physical Mac: synthetic core
 
 With Xcode 27.1 installed, the contributor ran `swift test --jobs 2` twice on physical Apple Silicon macOS. Native XCTest: 9 DomainTests + 4 StoreTests, **13 tests passed, 0 failures**, shell exit code **0**. The separate Swift Testing runner showed zero tests because the project uses XCTest. M2 additionally passed five direct-swiftc regression groups; PR #5 has been merged into `main`. See [M2_CORE.md](M2_CORE.md) for exact QA evidence.
 
+## M3A ClickUp foundation — UNVERIFIED source
+
+Four new synthetic XCTest methods in `ClickUpReadTests.swift` cover read-only identity/discovery, raw status/date normalization, fully paged imports with rate-limit failure preserving existing SQLite data, and unknown status/scope rejection. The Keychain implementation has not been smoke-tested with a real signed binary. **No M3A XCTest or native compilation result has been received yet.** From the M3A branch run `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer /usr/bin/swift test --jobs 2`; the expected count is 17 only if compilation/execution succeeds. See [M3A guide](M3_CLICKUP_FOUNDATION.md).
+
 ## Test matrix
 | Area | Cases |
 | --- | --- |
