@@ -2,9 +2,13 @@
 
 **M1 local compilation and selected smoke tests completed on 2026-10-22; keyboard navigation failed and extended accessibility verification remains open.** This document describes future gates; see [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for evidence and remaining checks.
 
-## M2 native XCTest — accepted 2026-10-22
+## M2.5 local integration validation — 2026-10-22
 
-Full suite executed twice on a physical Apple Silicon Mac, after installing Xcode 27.1. The second run of `swift test --jobs 2` on `feat/m2-domain-store` reported 9 DomainTests, 4 StoreTests, 13 total XCTest tests, **zero failures** and **exit code 0**. The separate Swift Testing runner reported zero tests because this package uses XCTest. Previously five direct-swiftc core regression groups passed as well. These verify domain/storage implementation with synthetic inputs, not live provider APIs. See [M2_CORE.md](M2_CORE.md) for evidence.
+The contributor ran `zsh ./test-m25-direct.sh` on a physical Mac: synthetic core-backed dashboard 18/6/3/5 and four change events PASS; paginated fake adapter, preservation of last valid SQLite snapshot after second-page failure, and repeated-cursor rejection PASS. `zsh ./build.sh` compiled and signed the app, and post-relaunch screenshots verified header M2.5, feed/four metrics, and Important filter reducing four events to three. Light appearance, all M2.5 view scenarios, keyboard/VoiceOver remain unverified on the M2.5 binary and must be checked before public release. See [M25_PREVIEW_BRIDGE.md](M25_PREVIEW_BRIDGE.md).
+
+## M2 native XCTest — accepted and merged 2026-10-22
+
+With Xcode 27.1 installed, the contributor ran `swift test --jobs 2` twice on physical Apple Silicon macOS. Native XCTest: 9 DomainTests + 4 StoreTests, **13 tests passed, 0 failures**, shell exit code **0**. The separate Swift Testing runner showed zero tests because the project uses XCTest. M2 additionally passed five direct-swiftc regression groups; PR #5 has been merged into `main`. See [M2_CORE.md](M2_CORE.md) for exact QA evidence.
 
 ## Test matrix
 | Area | Cases |

@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status (2026-10-22):** M1 native preview validated; M2 domain/SQLite core passed 13 native XCTest cases (0 failures) and five independent local regression groups. M2.5 synthetic UI bridge validated in a stacked draft PR, pending integration. No stable public release or live provider connections.
+> **Status (2026-10-22):** M1 menu bar preview validated; M2 normalized domain and SQLite core merged into `main` after **13 XCTest tests (0 failures)** and five standalone smoke groups. M2.5 synthetic core-backed UI and provider ingestion passed local integration smoke, macOS compilation and dark-mode visual/filter QA; PR #6 is synchronized with `main` and undergoing final review. No live integrations or stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -25,14 +25,15 @@ open ./build/OVTasks.app
 
 The build output is local, unsigned for distribution (ad-hoc only), and uses fictional data exclusively. **No login, network sync or native notifications** are implemented yet. See [M1 prototype and QA guide](docs/M1_PROTOTYPE.md).
 
-## M2 core tests (development branch)
+## M2 core tests (accepted in main)
 
-The M2 branch introduces `OVTasksCore` as a separate Swift Package with normalized task models, scoped counters, baseline-safe event diffs, atomic SQLite snapshots and deterministic tests. **This core is not yet connected to the M1 popover.** Run `swift test` on a Mac with Command Line Tools; see [M2 core and QA](docs/M2_CORE.md). Its correctness is **not yet validated** until those tests pass.
+The accepted M2 core (`OVTasksCore`) is a Swift Package with normalized models, scoped counters, baseline-safe event diffs and transactional SQLite snapshots. **13 XCTest cases passed (0 failures) on a real Mac with Xcode 27.1** before PR #5 was merged into `main`. The separate M2.5 branch connects the core to a synthetic popover; its direct integration smoke, native app compilation and primary dark-mode visual/filter QA also passed on the Mac. See [M2 core and QA](docs/M2_CORE.md) and [M2.5 bridge](docs/M25_PREVIEW_BRIDGE.md). No real provider data has been tested.
 
 ## Project documentation
 
 - [M1 native interface preview / build / visual QA](docs/M1_PROTOTYPE.md)
 - [M2 core, local persistence and Swift test guide](docs/M2_CORE.md)
+- [M2.5 synthetic core/UI bridge and provider tests](docs/M25_PREVIEW_BRIDGE.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)

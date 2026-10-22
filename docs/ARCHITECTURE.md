@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status: M1 app shell validated on macOS; M2 independent `OVTasksCore` implementation exists in source, not yet compiled/tested or connected to UI. Actual provider fetching and notifications do not exist.**
+**Status (2026-10-22): M1 app shell validated; M2 core passed native XCTest 13/13, zero failures, and is merged in `main`. M2.5 synthetic SwiftUI/SQLite bridge and typed paging contract passed local Mac integration smoke and dark-mode visual QA and are under final PR #6 review. No live providers or notifications exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
@@ -40,7 +40,11 @@ CONTRIBUTING.md
 AGENTS.md
 .gitignore
 ```
-The M1 SwiftUI files remain under `Sources/OVTasksApp`. The M2 branch implements `Sources/OVTasksCore/{Models,Metrics,Events,Persistence,Sync}` plus `Package.swift` and `Tests/OVTasksCoreTests`. Connector/notification/security/runtime integration folders in the illustration above are **future targets**, not working code. See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) and [M2_CORE.md](M2_CORE.md).
+The M1 SwiftUI files remain under `Sources/OVTasksApp`. The M2 milestone implemented `Sources/OVTasksCore/{Models,Metrics,Events,Persistence,Sync}` plus `Package.swift` and `Tests/OVTasksCoreTests`. Connector/notification/security/runtime integration folders in the illustration above are **future targets**, not working code. See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) and [M2_CORE.md](M2_CORE.md).
+
+## M2.5 development bridge
+
+The M2.5 branch introduces `CoreDemoFactory` (random temporary SQLite populated only with synthetic tasks), `PreviewStore` asynchronous loading and adapters for rendering `DashboardMetrics`/`ChangeEvent` in the existing SwiftUI popover. It also adds `ProviderAdapter` + `SnapshotIngestor`, a typed pagination collector that refuses partial commits. The integration smoke and native build passed on the contributor's Mac, and dark-mode dashboard/filter screenshots were reviewed. This is **not** a live provider client. See [M2.5 preview](M25_PREVIEW_BRIDGE.md) and [provider contract](PROVIDER_CONTRACT.md).
 
 ## Data flow
 1. User authorizes a provider; token/refresh material goes to Keychain only.
@@ -61,9 +65,9 @@ Define a stable typed ProviderAdapter contract (see [PROVIDER_CONTRACT](PROVIDER
 ## Optional later architecture
 An opt-in hosted relay may facilitate webhook ingestion and confidential OAuth grants. Its costs, authentication, event verification, data retention and threat model require a separate design/release. Local mode must remain viable.
 
-## M2 persistence decision pending validation
+## M2 persistence implementation (unit-test validated)
 
-The M2 branch contains a direct SQLite3 actor-confined store, with `user_version=1`, transactional complete-scope replacements and account-specific deletion, avoiding third-party dependencies. The default app support file is `~/Library/Application Support/OVTasks/snapshots.sqlite` (the path is an example of a normal runtime location, **not an already-created user file**). The M1 UI remains disconnected; no real local data has been stored by this source yet. Before adopting the store, compile and test it on macOS, then validate migration/recovery/retention in subsequent milestones.
+The M2 core in `main` contains a directly SQLite3-backed actor-confined store, with `user_version=1`, transactional complete-scope replacements and account-specific deletion. Native XCTest passed on macOS. The persistent app-support path `~/Library/Application Support/OVTasks/snapshots.sqlite` remains a **planned production path**, not an existing account database; M2.5 uses disposable SQLite only. Recovery, migrations beyond v1 and retention must still be validated before real accounts.
 
 ## Open engineering choices
 SQLite3 directly vs reviewed SQLite wrapper, final menu bar primitive, login-item lifecycle, signing/notarization and minimum macOS version require spikes; don't claim benchmark or compatibility until tested.

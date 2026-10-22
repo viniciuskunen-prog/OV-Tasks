@@ -18,11 +18,11 @@ struct DashboardView: View {
 
             activityHeader
 
-            if preview.scenario == .loading {
+            if preview.scenario == .loading || (!preview.demoReady && preview.demoFailure == nil && preview.scenario != .empty) {
                 placeholder(
                     symbol: "arrow.triangle.2.circlepath",
-                    title: "Carregando dados fictícios",
-                    explanation: "Estado de carregamento para avaliação do layout."
+                    title: "Calculando dados fictícios",
+                    explanation: "O núcleo M2 processa dados sintéticos locais."
                 )
             } else if preview.activities.isEmpty {
                 placeholder(
@@ -80,7 +80,7 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("OV Tasks")
                     .font(.system(size: 16, weight: .semibold))
-                Text("Protótipo M1 · Dados fictícios")
+                Text("Protótipo M2.5 · Dados fictícios")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
@@ -124,7 +124,7 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: preview.scenario.statusIcon)
-                Text(preview.scenario.statusText)
+                Text(preview.demoFailure == nil ? preview.scenario.statusText : "Falha na simulação local")
                     .lineLimit(1)
                 Spacer()
                 Text("Sem sync real")
@@ -144,7 +144,9 @@ struct DashboardView: View {
                 MetricCard(label: "Concluídas", value: preview.metrics.completed, symbol: "checkmark.circle")
             }
 
-            if preview.scenario == .offline {
+            if preview.demoFailure != nil {
+                banner(symbol: "exclamationmark.triangle", message: "Não foi possível calcular os dados de demonstração.")
+            } else if preview.scenario == .offline {
                 banner(
                     symbol: "wifi.slash",
                     message: "Você está vendo dados de cache simulados. As atualizações ficam pausadas."
@@ -183,7 +185,7 @@ struct DashboardView: View {
         HStack(spacing: 8) {
             Image(systemName: "circle.dotted")
                 .foregroundStyle(.secondary)
-            Text("3 fontes de demonstração")
+            Text("3 fontes simuladas · SQLite local")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
@@ -208,7 +210,7 @@ struct DashboardView: View {
 
     private func placeholder(symbol: String, title: String, explanation: String) -> some View {
         VStack(spacing: 9) {
-            if preview.scenario == .loading {
+            if preview.scenario == .loading || (!preview.demoReady && preview.demoFailure == nil) {
                 ProgressView()
                     .controlSize(.regular)
             } else {
