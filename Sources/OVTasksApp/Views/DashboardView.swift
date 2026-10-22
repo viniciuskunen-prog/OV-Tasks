@@ -176,6 +176,8 @@ struct DashboardView: View {
                 banner(symbol: "exclamationmark.triangle", message: error)
             } else if clickUp.isConnected && !clickUp.hasSelectedLists {
                 banner(symbol: "list.bullet", message: "Selecione listas nas configurações para acompanhar tarefas reais.")
+            } else if clickUp.isConnected && clickUp.hasSelectedLists && clickUp.lastSuccessfulSync == nil {
+                banner(symbol: "arrow.clockwise", message: "Listas selecionadas, mas ainda sem uma sincronização concluída. Use Atualizar.")
             } else if clickUp.isConnected && clickUp.unmappedStatusCount > 0 {
                 banner(symbol: "questionmark.circle", message: "\(clickUp.unmappedStatusCount) tarefas com status personalizado sem mapeamento. Os totais podem estar incompletos.")
             } else if clickUp.isConnected && clickUp.metrics?.completedIsComplete == false {
