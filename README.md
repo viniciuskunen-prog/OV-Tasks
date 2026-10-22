@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status:** M1 native preview validated on macOS; M2 domain engine and SQLite cache implemented as source on a separate branch, **pending local Swift Package tests**. No stable release or live integrations.
+> **Status:** M1 native menu bar preview validated; M2 core passed direct-Swift runtime smoke (five groups), but XCTest remains blocked by SwiftPM locally. M2.5 core-backed synthetic UI and provider ingestion contract are implemented in a stacked draft branch, **pending their own local build/test**. No live integrations or stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -27,12 +27,13 @@ The build output is local, unsigned for distribution (ad-hoc only), and uses fic
 
 ## M2 core tests (development branch)
 
-The M2 branch introduces `OVTasksCore` as a separate Swift Package with normalized task models, scoped counters, baseline-safe event diffs, atomic SQLite snapshots and deterministic tests. **This core is not yet connected to the M1 popover.** Run `swift test` on a Mac with Command Line Tools; see [M2 core and QA](docs/M2_CORE.md). Its correctness is **not yet validated** until those tests pass.
+The M2 branch introduces `OVTasksCore` as a separate Swift Package with normalized task models, scoped counters, baseline-safe event diffs, atomic SQLite snapshots and deterministic tests. **The M2.5 development branch now connects it to a synthetic popover preview, pending real Mac validation.** Run `swift test` on a Mac with Command Line Tools; see [M2 core and QA](docs/M2_CORE.md). Its correctness is **not yet validated** until those tests pass.
 
 ## Project documentation
 
 - [M1 native interface preview / build / visual QA](docs/M1_PROTOTYPE.md)
 - [M2 core, local persistence and Swift test guide](docs/M2_CORE.md)
+- [M2.5 synthetic core/UI bridge and provider tests](docs/M25_PREVIEW_BRIDGE.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)
