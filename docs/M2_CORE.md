@@ -119,15 +119,37 @@ git pull --ff-only
 zsh ./diagnose-swiftpm.sh
 ```
 
-**Diagnostic has NOT yet run** on the contributor Mac. Interpret its outcomes:
+**Isolated diagnostic ACTUALLY RAN twice on 2026-10-22 and failed independently of OV Tasks:**
 
-- If **all minimal packages fail**, the issue is demonstrably independent of OV Tasks and strongly implicates the local CLT SwiftPM/PackageDescription installation.
-- If the **explicit legacy overload works** but the minimal modern form fails, we can investigate a *targeted* portable overload choice without reinstalling tools.
-- If **minimal packages pass**, the project manifest or build configuration needs further reduction/inspection.
+```text
+Developer directory: /Library/Developer/CommandLineTools
+Apple Swift 6.4 (swiftlang-6.4.0.34.1), arm64-apple-macosx27.0.0
+Swift Package Manager - Swift 6.4.0-dev
+Native xctest runner: not found with active developer tools
+FAIL: tools59-minimal — manifest failed without any OV Tasks source
+FAIL: tools59-legacy-overload — manifest failed without any OV Tasks source
+FAIL: tools60-minimal — manifest failed without any OV Tasks source
+Diagnostic complete: 0 passed; 3 failed.
+```
 
-Even when the manifest issue is solved, Command Line Tools without full Xcode may lack the native `xctest` executable; that is a **separate** potential limitation, not proof from these logs. Apple recommends updating compatible Command Line Tools through System Settings → Software Update or official developer downloads before considering destructive uninstallation. Do not uninstall system tools speculatively.
+All three manifest link failures name the same unavailable `PackageDescription.Package.__allocating_init(... swiftLanguageVersions: ...)` symbol. Even the independent `Package(name: "Probe", targets: ...)` SwiftPM minimal package fails, so **the failure is proven independent of the repository's source and particular manifest options**. This strongly suggests that the current local Command Line Tools installation has an incompatible Swift compiler/PackageDescription runtime or a related packaging issue. **The exact mismatched component has not yet been proven.**
 
-The M2 direct runtime smoke and M2.5 native UI demonstration already passed; these remain valid evidence for their tested scenarios but do not imply XCTest passed.
+The current active tools do not expose `xctest` using `xcrun --find xctest`. This adds another reason not to claim that XCTest could run on this specific setup even after the manifest is fixed. It does not by itself prove that all Command Line Tools installations lack XCTest.
+
+### Safe next step — inventory official tools updates (no changes)
+
+```zsh
+pkgutil --pkg-info=com.apple.pkg.CLTools_Executables
+softwareupdate --list
+```
+
+These commands report the currently installed Command Line Tools package receipt and any Apple-supported updates available for that Mac; they do not install or uninstall anything. Apple recommends checking for a Command Line Tools version compatible with the macOS release and using Software Update or the official Apple Developer downloads. See [Apple: Installing the command-line tools](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools).
+
+If Software Update offers a compatible Command Line Tools update, apply it through **System Settings → General → Software Update** after verifying the offered version. If none is available, check Apple's official [More Downloads](https://developer.apple.com/download/all/) for a compatible complete CLT installer or full Xcode; installing a matching Xcode and testing it using `DEVELOPER_DIR` does not require changing `xcode-select` globally. Avoid `sudo rm -rf /Library/Developer/CommandLineTools` and avoid reinstalling an arbitrary Xcode version without checking macOS compatibility.
+
+After repairing the toolchain, rerun `zsh ./diagnose-swiftpm.sh`. Only after a minimal probe passes should we retry `swift test --jobs 2` and then resolve any XCTest compilation/logic failures separately. The M2 five-group runtime smoke and M2.5 demo/UI smoke already **passed** with direct `swiftc` and remain valid for their tested scenarios.
+
+**Acceptance:** parent PR #5 and stacked PR #6 remain drafts. No GitHub Actions run; don't alter project code to accommodate a demonstrably failing global PackageDescription installation.
 
 ## Alternative direct-`swiftc` executable smoke test (CLT-only)
 
