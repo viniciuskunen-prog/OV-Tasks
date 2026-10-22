@@ -1,19 +1,19 @@
 # Implementation roadmap
 
-**Status:** M0 documentation completed; M1 SwiftUI preview source built and user-reviewed on a physical Mac in light and dark appearances (2026-10-22). Keyboard accessibility is a known deferred debt (#3) and is required before stable v1. Later milestones remain planned. No time estimates are implied.
+**Status (2026-10-22):** M0/M1 completed for documented scope. M2 core passed local XCTest (13 tests, zero failures, exit code 0) and five direct-swiftc smoke groups. M2.5 synthetic UI bridge has passed local macOS runtime/visual smoke in its stacked draft PR; provider integrations M3+ are still planned. Accessibility issue #3 remains a public-release blocker.
 
 | Milestone | Goal | Acceptance / exit criteria |
 | --- | --- | --- |
 | M0 — Documentation baseline | Public repo, developer docs and governance | README, architecture, provider contract, UI spec, security, contributing guide, no secrets |
 | M1 — Native shell (accepted with keyboard access debt) | SwiftUI menu bar app with mocked states | Physical Mac build, popover/theme/settings, scenario persistence, demo link dialog, Quit verified; keyboard/VoiceOver reserved for mandatory pre-release QA (#3) |
-| M2 — Domain engine | Store, normalizer, counters, diff, scheduler | Unit tests for status maps, deadlines, duplicate event handling, baseline import, migrations |
+| M2 — Domain engine (XCTest accepted) | Normalized models, counters, diff, SQLite cache, poll planning | Local `swift test` passes, baseline/duplicate/DST/account-isolation tests pass; M2 is core-only (no live scheduler or UI data binding) |
 | M3 — ClickUp | First end-to-end provider integration | Authorized scoped tasks, pagination, read-only mapping and links; secrets never in bundle; auth release path documented |
 | M4 — Trello | Board/card synchronization | Per-board status mapping, due behavior, scoped connection and links; quota tests |
 | M5 — NanoTask | Authenticated least-privilege client | Dedicated API contract, RLS/isolation tests, no publication of private NanoTask internals |
 | M6 — Notifications and hardening | Event notifications and trust | Quiet hours, dedup after relaunch, offline/wake, account revocation, local data deletion, accessibility |
 | M7 — v1 public release | Release-quality macOS package | Signing/notarization strategy, checksum, reproducible documented local build, smoke on clean Mac, changelog, LICENSE, privacy notice |
 
-See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for local build commands, scenario controls, visual verification and known limitations.
+See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) for UI smoke evidence and [M2_CORE.md](M2_CORE.md) for core test commands and data-flow boundaries.
 
 ## M0 exit caveat
 Publishing the documentation alone is **not** a product release and does not validate third-party API behavior. Choose an open-source license and verify brand assets before distributing binaries or claiming permitted software reuse.

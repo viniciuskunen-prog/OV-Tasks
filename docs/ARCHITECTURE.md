@@ -1,6 +1,6 @@
 # System architecture (proposed)
 
-**Status: architecture proposal; only the M1 SwiftUI app shell, synthetic preview model and local build script are implemented in source. No core sync or connectors exist.**
+**Status: M1 app shell validated on macOS; M2 independent `OVTasksCore` implementation exists in source, not yet compiled/tested or connected to UI. Actual provider fetching and notifications do not exist.**
 
 ## Runtime
 A Swift/SwiftUI macOS menu-bar-only app targeting macOS 14+ (target to validate on first native build). Use `MenuBarExtra` or an `NSStatusItem` bridge only if status badge behavior requires it; SwiftUI window for Settings; `UserNotifications`, `URLSession`, `Security`/Keychain and a tested local SQLite-backed persistence layer. Prefer a Swift Package for business logic to keep it testable independent of AppKit. No Electron. No external server or Mac mini required.
@@ -40,7 +40,7 @@ CONTRIBUTING.md
 AGENTS.md
 .gitignore
 ```
-The M1 source currently uses `Sources/OVTasksApp/OVTasksApp.swift`, `Preview/PreviewData.swift`, `Views/DashboardView.swift` and `Settings/PreviewSettingsView.swift`; the remaining folders above are future design targets, not an existing tree. Refer to [M1_PROTOTYPE.md](M1_PROTOTYPE.md).
+The M1 SwiftUI files remain under `Sources/OVTasksApp`. The M2 branch implements `Sources/OVTasksCore/{Models,Metrics,Events,Persistence,Sync}` plus `Package.swift` and `Tests/OVTasksCoreTests`. Connector/notification/security/runtime integration folders in the illustration above are **future targets**, not working code. See [M1_PROTOTYPE.md](M1_PROTOTYPE.md) and [M2_CORE.md](M2_CORE.md).
 
 ## Data flow
 1. User authorizes a provider; token/refresh material goes to Keychain only.
@@ -60,6 +60,10 @@ Define a stable typed ProviderAdapter contract (see [PROVIDER_CONTRACT](PROVIDER
 
 ## Optional later architecture
 An opt-in hosted relay may facilitate webhook ingestion and confidential OAuth grants. Its costs, authentication, event verification, data retention and threat model require a separate design/release. Local mode must remain viable.
+
+## M2 persistence decision pending validation
+
+The M2 branch contains a direct SQLite3 actor-confined store, with `user_version=1`, transactional complete-scope replacements and account-specific deletion, avoiding third-party dependencies. The default app support file is `~/Library/Application Support/OVTasks/snapshots.sqlite` (the path is an example of a normal runtime location, **not an already-created user file**). The M1 UI remains disconnected; no real local data has been stored by this source yet. Before adopting the store, compile and test it on macOS, then validate migration/recovery/retention in subsequent milestones.
 
 ## Open engineering choices
 SQLite3 directly vs reviewed SQLite wrapper, final menu bar primitive, login-item lifecycle, signing/notarization and minimum macOS version require spikes; don't claim benchmark or compatibility until tested.

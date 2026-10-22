@@ -13,7 +13,7 @@ Public **technical decisions** belong here (and later can migrate into individua
 | D-007 | Four overlapping metrics, Done within 7-day window | Proposed (requires UX sign-off) | Clear dashboard labels without misleading sum |
 | D-008 | ClickUp OAuth via secure confidential exchange or opt-in user token fallback | Under investigation | Provider flow needs client secret; cannot embed it |
 | D-009 | Trello OAuth 2.0 public-client suitability for standalone native macOS | Under investigation | Official public clients exist, but native callback/client policy needs validation |
-| D-010 | Persistence backend: direct SQLite vs vetted wrapper | Open | Choose after first domain spike |
+| D-010 | Direct SQLite3 in isolated core actor; accept only after successful macOS tests | Provisional implementation (M2) | Transactional snapshots and event log without an additional third-party database library |
 | D-011 | Open-source license MIT vs Apache-2.0 | Open | LICENSE must be selected before redistribution |
 | D-012 | Polling around 5 min while awake | Proposed | To validate against quotas and power usage |
 | D-013 | No hosted GitHub Actions by default | Accepted (engineering policy) | Prefer local QA and selective release gates |
