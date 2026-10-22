@@ -18,14 +18,22 @@ SOURCES=(
     Sources/OVTasksApp/Preview/PreviewData.swift
     Sources/OVTasksApp/Views/DashboardView.swift
     Sources/OVTasksApp/Settings/PreviewSettingsView.swift
+    Sources/OVTasksCore/Models/TaskModels.swift
+    Sources/OVTasksCore/Metrics/MetricsCalculator.swift
+    Sources/OVTasksCore/Events/SnapshotDiffer.swift
+    Sources/OVTasksCore/Sync/SyncPlanner.swift
+    Sources/OVTasksCore/Persistence/SQLiteSnapshotStore.swift
+    Sources/OVTasksCore/Providers/ProviderAdapter.swift
+    Sources/OVTasksCore/Demo/CoreDemoFactory.swift
 )
 
-echo "Building OV Tasks M1 (synthetic-data preview)..."
+echo "Building OV Tasks M2.5 (core-backed synthetic preview)..."
 xcrun --sdk macosx swiftc \
     -parse-as-library \
     -target "$(uname -m)-apple-macosx14.0" \
     -framework SwiftUI \
     -framework AppKit \
+    -lsqlite3 \
     -O \
     $SOURCES \
     -o "$APP/Contents/MacOS/OVTasks"
@@ -63,4 +71,4 @@ echo "Local preview created at: $APP"
 echo "Open with:"
 echo "  open \"$APP\""
 echo ""
-echo "No real provider connections, task data or macOS notifications are implemented."
+echo "Demo uses core metrics/diff and temporary local SQLite; no real accounts or notifications."
