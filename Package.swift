@@ -11,7 +11,10 @@ let package = Package(
         .target(
             name: "OVTasksCore",
             path: "Sources/OVTasksCore",
-            linkerSettings: [.linkedLibrary("sqlite3")]
+            linkerSettings: [
+                .linkedLibrary("sqlite3"),
+                .linkedFramework("Security") // macOS Keychain for future explicit account connection
+            ]
         ),
         .testTarget(
             name: "OVTasksCoreTests",
