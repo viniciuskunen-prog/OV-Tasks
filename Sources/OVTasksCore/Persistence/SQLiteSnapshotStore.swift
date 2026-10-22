@@ -174,7 +174,12 @@ public actor SQLiteSnapshotStore {
         var result: [TaskSummary] = []
         try statement("SELECT payload FROM tasks WHERE scope_key = ? ORDER BY task_key;") { stmt in
             try bind(scope.storageKey, to: stmt, index: 1)
-            while sqlite3_step(stmt) == SQLITE_ROW {
+            while true {
+                let step = sqlite3_step(stmt)
+                if step == SQLITE_DONE { break }
+                guard step == SQLITE_ROW else {
+                    throw SnapshotStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
+                }
                 let json = try columnText(stmt, index: 0)
                 result.append(try decode(TaskSummary.self, from: json))
             }
@@ -197,7 +202,12 @@ public actor SQLiteSnapshotStore {
             SELECT payload FROM events ORDER BY detected_at DESC, event_key DESC LIMIT ?;
             """) { stmt in
             sqlite3_bind_int(stmt, 1, Int32(min(limit, 1000)))
-            while sqlite3_step(stmt) == SQLITE_ROW {
+            while true {
+                let step = sqlite3_step(stmt)
+                if step == SQLITE_DONE { break }
+                guard step == SQLITE_ROW else {
+                    throw SnapshotStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
+                }
                 let json = try columnText(stmt, index: 0)
                 result.append(try decode(ChangeEvent.self, from: json))
             }
@@ -209,8 +219,11 @@ public actor SQLiteSnapshotStore {
         var value: Date?
         try statement("SELECT last_synced FROM scopes WHERE scope_key = ?;") { stmt in
             try bind(scope.storageKey, to: stmt, index: 1)
-            if sqlite3_step(stmt) == SQLITE_ROW {
+            let step = sqlite3_step(stmt)
+            if step == SQLITE_ROW {
                 value = Date(timeIntervalSince1970: sqlite3_column_double(stmt, 0))
+            } else if step != SQLITE_DONE {
+                throw SnapshotStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
             }
         }
         return value
@@ -236,8 +249,11 @@ public actor SQLiteSnapshotStore {
         var value: Int?
         try statement("SELECT sequence FROM scopes WHERE scope_key = ?;") { stmt in
             try bind(scope.storageKey, to: stmt, index: 1)
-            if sqlite3_step(stmt) == SQLITE_ROW {
+            let step = sqlite3_step(stmt)
+            if step == SQLITE_ROW {
                 value = Int(sqlite3_column_int64(stmt, 0))
+            } else if step != SQLITE_DONE {
+                throw SnapshotStoreError.sqlite(String(cString: sqlite3_errmsg(db)))
             }
         }
         return value
