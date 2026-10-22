@@ -34,10 +34,12 @@ public actor ClickUpKeychain: ClickUpCredentialSource {
             kSecAttrService as String: service,
             kSecAttrAccount as String: accountID
         ]
-        // Replace only the named account's credential, never another provider.
-        let deleteCode = SecItemDelete(query as CFDictionary)
-        guard deleteCode == errSecSuccess || deleteCode == errSecItemNotFound else {
-            throw ClickUpKeychainError.osStatus(Int(deleteCode))
+        // Update atomically first. An error must not destroy an existing token.
+        let updated: [String: Any] = [kSecValueData as String: data]
+        let updateCode = SecItemUpdate(query as CFDictionary, updated as CFDictionary)
+        if updateCode == errSecSuccess { return }
+        guard updateCode == errSecItemNotFound else {
+            throw ClickUpKeychainError.osStatus(Int(updateCode))
         }
         var add = query
         add[kSecValueData as String] = data
