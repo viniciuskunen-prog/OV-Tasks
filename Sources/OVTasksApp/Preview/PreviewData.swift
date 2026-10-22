@@ -85,7 +85,6 @@ struct PreviewMetrics {
     let overdue: Int
     let completed: Int
 
-    static let sample = PreviewMetrics(pending: 18, inProgress: 6, overdue: 3, completed: 5)
     static let empty = PreviewMetrics(pending: 0, inProgress: 0, overdue: 0, completed: 0)
 }
 
@@ -99,58 +98,7 @@ struct PreviewEvent: Identifiable {
     let isImportant: Bool
     let occurredAt: Date
 
-    static let samples: [PreviewEvent] = [
-        PreviewEvent(
-            id: "clickup-status-1",
-            typeLabel: "Status alterado",
-            taskName: "Revisar apresentação visual",
-            summary: "Em andamento → Concluída",
-            provider: .clickup,
-            systemImage: "checkmark.circle",
-            isImportant: false,
-            occurredAt: Date(timeIntervalSinceNow: -12 * 60)
-        ),
-        PreviewEvent(
-            id: "trello-due-1",
-            typeLabel: "Prazo vencendo",
-            taskName: "Preparar peças de divulgação",
-            summary: "Vence em 2 horas",
-            provider: .trello,
-            systemImage: "calendar.badge.exclamationmark",
-            isImportant: true,
-            occurredAt: Date(timeIntervalSinceNow: -35 * 60)
-        ),
-        PreviewEvent(
-            id: "nanotask-status-1",
-            typeLabel: "Nova etapa",
-            taskName: "Revisar plano de testes",
-            summary: "Em andamento → Em revisão",
-            provider: .nanoTask,
-            systemImage: "arrow.triangle.branch",
-            isImportant: true,
-            occurredAt: Date(timeIntervalSinceNow: -72 * 60)
-        ),
-        PreviewEvent(
-            id: "trello-overdue-1",
-            typeLabel: "Prazo vencido",
-            taskName: "Finalizar revisão de conteúdo",
-            summary: "Venceu ontem",
-            provider: .trello,
-            systemImage: "exclamationmark.circle",
-            isImportant: true,
-            occurredAt: Date(timeIntervalSinceNow: -4 * 3600)
-        ),
-        PreviewEvent(
-            id: "clickup-comment-1",
-            typeLabel: "Novo comentário",
-            taskName: "Conferir documentação do projeto",
-            summary: "Há uma nova atualização na tarefa",
-            provider: .clickup,
-            systemImage: "bubble.left",
-            isImportant: false,
-            occurredAt: Date(timeIntervalSinceNow: -7 * 3600)
-        )
-    ]
+
 }
 
 extension PreviewEvent {
