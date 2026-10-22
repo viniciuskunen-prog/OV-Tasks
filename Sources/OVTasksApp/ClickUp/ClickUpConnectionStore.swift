@@ -96,7 +96,7 @@ final class ClickUpConnectionStore: ObservableObject {
              ClickUpAPIError.invalidPageCursor,
              ProviderSyncError.exceededPageLimit, ProviderSyncError.exceededTaskLimit:
             return "O ClickUp retornou dados inesperados ou uma lista muito grande. Dados anteriores preservados."
-        case CancellationError:
+        case is CancellationError:
             return "Operação cancelada. Dados anteriores preservados."
         default:
             return "Falha de conexão ou leitura local. Os dados anteriores foram preservados."
