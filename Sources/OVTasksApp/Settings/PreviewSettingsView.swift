@@ -76,6 +76,13 @@ struct PreviewSettingsView: View {
                         }
                     }
 
+                    if !clickUp.browsingWorkspaceID.isEmpty && clickUp.spaces.isEmpty {
+                        Button("Carregar Spaces deste Workspace") {
+                            Task { await clickUp.chooseWorkspace(clickUp.browsingWorkspaceID) }
+                        }
+                        .disabled(clickUp.isBusy)
+                    }
+
                     if !clickUp.spaces.isEmpty {
                         Picker("Space", selection: Binding(
                             get: { clickUp.browsingSpaceID },
@@ -86,6 +93,13 @@ struct PreviewSettingsView: View {
                                 Text(space.name).tag(space.id)
                             }
                         }
+                    }
+
+                    if !clickUp.browsingSpaceID.isEmpty && clickUp.availableLists.isEmpty {
+                        Button("Carregar listas deste Space") {
+                            Task { await clickUp.chooseSpace(clickUp.browsingSpaceID) }
+                        }
+                        .disabled(clickUp.isBusy)
                     }
 
                     if !clickUp.availableLists.isEmpty {
