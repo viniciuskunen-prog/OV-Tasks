@@ -3,9 +3,25 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject private var preview: PreviewStore
+    @EnvironmentObject private var clickUp: ClickUpConnectionStore
 
     private let panelWidth: CGFloat = 428
     private let panelHeight: CGFloat = 584
+
+    private var shownMetrics: PreviewMetrics {
+        guard clickUp.isConnected else { return preview.metrics }
+        guard let value = clickUp.metrics else { return .empty }
+        return PreviewMetrics(pending: value.pending, inProgress: value.inProgress,
+                              overdue: value.overdue, completed: value.completed)
+    }
+
+    private var shownActivities: [PreviewEvent] {
+        guard clickUp.isConnected else { return preview.activities }
+        switch preview.activityFilter {
+        case .all: return clickUp.activities
+        case .important: return clickUp.activities.filter(\.isImportant)
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -18,29 +34,39 @@ struct DashboardView: View {
 
             activityHeader
 
-            if preview.scenario == .loading || (!preview.demoReady && preview.demoFailure == nil && preview.scenario != .empty) {
+            if !clickUp.isConnected && (preview.scenario == .loading || (!preview.demoReady && preview.demoFailure == nil && preview.scenario != .empty)) {
                 placeholder(
                     symbol: "arrow.triangle.2.circlepath",
                     title: "Calculando dados fictícios",
                     explanation: "O núcleo M2 processa dados sintéticos locais."
                 )
-            } else if preview.activities.isEmpty {
+            } else if shownActivities.isEmpty {
                 placeholder(
                     symbol: "tray",
-                    title: preview.scenario == .empty ? "Nenhuma tarefa por aqui" : "Sem atividade neste filtro",
-                    explanation: preview.scenario == .empty
-                        ? "Conecte um serviço futuramente para acompanhar suas tarefas."
-                        : "Não há eventos importantes nesta amostra."
+                    title: clickUp.isConnected ? "Sem mudanças recentes" : (preview.scenario == .empty ? "Nenhuma tarefa por aqui" : "Sem atividade neste filtro"),
+                    explanation: clickUp.isConnected
+                        ? "A primeira sincronização não cria alertas históricos. Selecione listas e sincronize nas configurações."
+                        : (preview.scenario == .empty
+                            ? "Conecte um serviço futuramente para acompanhar suas tarefas."
+                            : "Não há eventos importantes nesta amostra.")
                 )
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(preview.activities) { event in
+                        ForEach(shownActivities) { event in
                             ActivityRow(event: event) {
-                                preview.selectedEvent = event
+                                if clickUp.isConnected {
+                                    if let url = clickUp.taskURL(for: event.id) {
+                                        NSWorkspace.shared.open(url)
+                                    } else {
+                                        clickUp.reportMissingTaskLink()
+                                    }
+                                } else {
+                                    preview.selectedEvent = event
+                                }
                             }
 
-                            if event.id != preview.activities.last?.id {
+                            if event.id != shownActivities.last?.id {
                                 Divider()
                                     .padding(.leading, 38)
                             }
@@ -80,13 +106,14 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("OV Tasks")
                     .font(.system(size: 16, weight: .semibold))
-                Text("Protótipo M2.5 · Dados fictícios")
+                Text(clickUp.isConnected ? "ClickUp · Dados reais/cache local" : "Protótipo M2.5 · Dados fictícios")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
 
             Spacer(minLength: 12)
 
+            if !clickUp.isConnected {
             Menu {
                 ForEach(PreviewScenario.allCases) { scenario in
                     Button {
@@ -107,13 +134,14 @@ struct DashboardView: View {
             .buttonStyle(.borderless)
             .help("Alternar cenário da prévia")
             .accessibilityLabel("Alternar cenário da prévia")
+            }
 
             SettingsLink {
                 Image(systemName: "gearshape")
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
-            .help("Configurações do protótipo")
+            .help("Configurações e conexão ClickUp")
             .accessibilityLabel("Abrir configurações")
         }
         .padding(.horizontal, 17)
@@ -123,35 +151,39 @@ struct DashboardView: View {
     private var dashboard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
-                Image(systemName: preview.scenario.statusIcon)
-                Text(preview.demoFailure == nil ? preview.scenario.statusText : "Falha na simulação local")
+                Image(systemName: clickUp.isConnected ? "checkmark.shield" : preview.scenario.statusIcon)
+                Text(clickUp.isConnected ? clickUp.message : (preview.demoFailure == nil ? preview.scenario.statusText : "Falha na simulação local"))
                     .lineLimit(1)
                 Spacer()
-                Text("Sem sync real")
+                Text(clickUp.isConnected ? "Manual" : "Sem sync real")
                     .foregroundStyle(.tertiary)
             }
             .font(.caption)
-            .foregroundStyle(preview.scenario == .offline || preview.scenario == .reconnect
+            .foregroundStyle(!clickUp.isConnected && (preview.scenario == .offline || preview.scenario == .reconnect)
                 ? Color.orange : Color.secondary)
 
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(minimum: 74), spacing: 8), count: 4),
                 spacing: 8
             ) {
-                MetricCard(label: "Pendentes", value: preview.metrics.pending, symbol: "tray.full")
-                MetricCard(label: "Em curso", value: preview.metrics.inProgress, symbol: "clock")
-                MetricCard(label: "Atrasadas", value: preview.metrics.overdue, symbol: "exclamationmark.circle")
-                MetricCard(label: "Concluídas", value: preview.metrics.completed, symbol: "checkmark.circle")
+                MetricCard(label: "Pendentes", value: shownMetrics.pending, symbol: "tray.full")
+                MetricCard(label: "Em curso", value: shownMetrics.inProgress, symbol: "clock")
+                MetricCard(label: "Atrasadas", value: shownMetrics.overdue, symbol: "exclamationmark.circle")
+                MetricCard(label: "Concluídas", value: shownMetrics.completed, symbol: "checkmark.circle")
             }
 
-            if preview.demoFailure != nil {
+            if clickUp.isConnected, let error = clickUp.errorMessage {
+                banner(symbol: "exclamationmark.triangle", message: error)
+            } else if clickUp.isConnected && !clickUp.hasSelectedLists {
+                banner(symbol: "list.bullet", message: "Selecione listas nas configurações para acompanhar tarefas reais.")
+            } else if !clickUp.isConnected && preview.demoFailure != nil {
                 banner(symbol: "exclamationmark.triangle", message: "Não foi possível calcular os dados de demonstração.")
-            } else if preview.scenario == .offline {
+            } else if !clickUp.isConnected && preview.scenario == .offline {
                 banner(
                     symbol: "wifi.slash",
                     message: "Você está vendo dados de cache simulados. As atualizações ficam pausadas."
                 )
-            } else if preview.scenario == .reconnect {
+            } else if !clickUp.isConnected && preview.scenario == .reconnect {
                 banner(
                     symbol: "lock.trianglebadge.exclamationmark",
                     message: "ClickUp precisa ser reconectado (cenário fictício)."
@@ -185,10 +217,21 @@ struct DashboardView: View {
         HStack(spacing: 8) {
             Image(systemName: "circle.dotted")
                 .foregroundStyle(.secondary)
-            Text("3 fontes simuladas · SQLite local")
+            Text(clickUp.isConnected ? "\(clickUp.watchedCount) listas ClickUp · SQLite local" : "3 fontes simuladas · SQLite local")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Spacer()
+            if clickUp.isConnected {
+                Button {
+                    Task { await clickUp.synchronize() }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.plain)
+                .disabled(clickUp.isBusy || !clickUp.hasSelectedLists)
+                .help("Sincronizar listas ClickUp agora")
+                .accessibilityLabel("Sincronizar ClickUp")
+            }
             Button("Sair") {
                 NSApp.terminate(nil)
             }
@@ -300,8 +343,8 @@ private struct ActivityRow: View {
                     .font(.caption)
                 }
                 .buttonStyle(.link)
-                .help("Demonstração: mostra o comportamento futuro do link para a tarefa")
-                .accessibilityLabel("Ver no \(event.provider.name), demonstração de \(event.taskName)")
+                .help("Abrir tarefa no serviço; link de demonstração se desconectado")
+                .accessibilityLabel("Ver no \(event.provider.name): \(event.taskName)")
                 .padding(.top, 3)
             }
         }
