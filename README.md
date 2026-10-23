@@ -2,7 +2,7 @@
 
 Open-source macOS menu bar dashboard for task activity across multiple services.
 
-> **Status (2026-10-22):** M1/M2/M2.5 development milestones integrated; 13 native M2 XCTest tests and M2.5 simulated macOS UI/adapter smoke previously passed. M3A ClickUp read-only foundation is now **merged into `main` via PR #7** after **17 native XCTest cases passed** (4 ClickUp + 13 M2), with no failures. Keychain access has not been tested in a signed running app. **No real provider connection in the app** and no stable release.
+> **Status (2026-10-22):** M1/M2/M2.5 development milestones integrated; 13 native M2 XCTest tests and M2.5 simulated macOS UI/adapter smoke previously passed. M3A ClickUp read-only foundation is now **merged into `main` via PR #7** after **17 native XCTest cases passed** (4 ClickUp + 13 M2), with no failures. An **unverified M3B development branch** now includes a ClickUp connection UI and user-triggered local read-only sync. The new app/UI code has **not yet been compiled or tested on the contributor's Mac**; no actual account was connected and there is no stable release.
 
 OV Tasks answers two questions: **How much work is pending?** and **What changed while I was working?** It intentionally does not replace a task manager.
 
@@ -35,6 +35,7 @@ The accepted M2 core (`OVTasksCore`) is a Swift Package with normalized models, 
 - [M2 core, local persistence and Swift test guide](docs/M2_CORE.md)
 - [M2.5 synthetic core/UI bridge and provider tests](docs/M25_PREVIEW_BRIDGE.md)
 - [M3A ClickUp foundation, API boundaries and Mac test gate](docs/M3_CLICKUP_FOUNDATION.md)
+- [M3B secure connection, list consent and manual SQLite sync — unverified developer preview](docs/M3B_CLICKUP_CONNECTION.md)
 - [Product specification](docs/PRODUCT.md)
 - [System architecture](docs/ARCHITECTURE.md)
 - [User experience and layout](docs/UI_UX.md)
