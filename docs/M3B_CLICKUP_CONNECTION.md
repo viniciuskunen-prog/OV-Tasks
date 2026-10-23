@@ -30,9 +30,26 @@ User checked out `feat/m3b-clickup-connection-ui` and executed `swift test --job
 - `test-m25-direct.sh` **PASS**, including synthetic metrics/events, pagination, cache preservation and repeated-cursor detection.
 - Native `build.sh` **FAILED** (the new M3B UI was not built). Compiler reported `Sources/OVTasksApp/ClickUp/ClickUpConnectionStore.swift:99:14: error: 'is' keyword required to pattern match against type name` for `case CancellationError:`.
 
-**Correction committed:** `3992d0e` changes the line to `case is CancellationError:`. This is a Swift pattern-match correction, not a change to provider behavior. **The corrected M3B native app has NOT been recompiled or tested yet.** It is possible subsequent compiler diagnostics will surface; report the entire new compiler output without supplying any ClickUp token. PR #8 remains draft and no real provider data has been accessed.
+**Correction committed:** `3992d0e` changes the line to `case is CancellationError:`. This is a Swift pattern-match correction, not a change to provider behavior. **The corrected M3B native app has now been compiled successfully** on the contributor's Mac. This supersedes the earlier diagnostic but does not prove the live account workflow. PR #8 remains draft and no real provider data has been accessed.
 
-## Local acceptance — rerun after correction
+## Native M3B build — PASSED 2026-10-22
+
+After pulling `3992d0e` and the documentation update, the contributor reran `zsh ./build.sh` on the physical Mac. Observed:
+
+```text
+Building OV Tasks M3B (ClickUp manual read-only connection + synthetic demo fallback)...
+/Users/ovinikunen/Projects/OV-Tasks/build/OVTasks.app/Contents/Info.plist: OK
+/Users/ovinikunen/Projects/OV-Tasks/build/OVTasks.app: replacing existing signature
+Local preview created at: /Users/ovinikunen/Projects/OV-Tasks/build/OVTasks.app
+ClickUp: explicit read-only connection and manual sync; tokens only in Keychain.
+Disconnected mode: synthetic M2.5 demo. No notifications or background polling.
+```
+
+**QA verdict so far:** M3B native UI, network client, Keychain sources and sqlite linkage **compile and ad-hoc sign successfully**. Earlier M3A/core XCTest **17/17 PASS**, M2.5 standalone smoke PASS. App **has not been launched after this successful build in the submitted log**; no evidence yet for GUI/Keychain/real ClickUp account behavior. Retain PR #8 as DRAFT until end-to-end tests.
+
+**Next manual test (no token in terminal/chat):** exit earlier OV Tasks preview from its menu; `open ./build/OVTasks.app`; verify menu-bar panel loads demo while disconnected; open gear icon Settings and verify local ClickUp SecureField. Then, for a controlled test account only, type the personal token inside that SecureField, verify identity, select one low-sensitivity test Workspace/Space/List, explicitly save, synchronize manually, observe cached metrics and restart behavior, and disconnect. Do not share private task names/screenshots or secrets.
+
+## Local regression commands (already passed)
 
 \`\`\`zsh
 cd ~/Projects/OV-Tasks
@@ -53,4 +70,4 @@ Do not enter a real token until **the native build passes**. For a later, contro
 
 Use public-safe summaries for bug reports (errors, counts, no credentials). No GitHub Actions used.
 
-**Acceptance still pending**: XCTest, native build, first authenticated read, Keychain roundtrip/relaunch, list selection after restart, status mapping accuracy, multiple-page/bad-network real behavior, offline/cache, disconnect cleanup and UI/accessibility.
+**Acceptance still pending**: GUI launch, first authenticated read, Keychain roundtrip/relaunch, list selection after restart, status mapping accuracy, multiple-page/bad-network real behavior, offline/cache, disconnect cleanup and UI/accessibility. XCTest (17/17), M2.5 smoke, and native app build have already passed in the documented local run.
