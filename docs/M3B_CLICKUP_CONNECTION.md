@@ -32,6 +32,12 @@ User checked out `feat/m3b-clickup-connection-ui` and executed `swift test --job
 
 **Correction committed:** `3992d0e` changes the line to `case is CancellationError:`. This is a Swift pattern-match correction, not a change to provider behavior. **The corrected M3B native app has now been compiled successfully** on the contributor's Mac. This supersedes the earlier diagnostic but does not prove the live account workflow. PR #8 remains draft and no real provider data has been accessed.
 
+## Initial Settings UI inspection — 2026-10-22
+
+User launched the compiled M3B app and provided a Settings screenshot: native window and ClickUp connection form rendered, and no account was connected. **UI issue discovered:** a macOS floating **“Senhas…”** Password AutoFill suggestion overlapped the token field/form, obstructing use. The native `SecureField` had the explicit `.textContentType(.password)` modifier, which marks an API token as a reusable website/app password. Commit `3fc39ae` removes **only that AutoFill semantic hint**, retaining the masked `SecureField`, accessibility label and local Keychain credential flow.
+
+**Validation pending:** the user must quit the old OV Tasks process, pull the branch, rebuild and relaunch to confirm the suggestion no longer blocks Settings. This is a targeted probable fix, **not yet proven** on the Mac after recompilation. No personal token entered in screenshot or sent to ChatGPT.
+
 ## Native M3B build — PASSED 2026-10-22
 
 After pulling `3992d0e` and the documentation update, the contributor reran `zsh ./build.sh` on the physical Mac. Observed:
