@@ -21,9 +21,11 @@ struct PreviewSettingsView: View {
                 }
 
                 HStack {
+                    // SecureField masks the API token. Avoid advertising it as a
+                    // website/app password: macOS Password AutoFill otherwise
+                    // displays the floating "Senhas..." suggestion over Settings.
                     SecureField(clickUp.isConnected ? "Substituir token pessoal" : "Token pessoal ClickUp",
                                 text: $personalToken)
-                        .textContentType(.password)
                         .accessibilityLabel("Token pessoal do ClickUp")
                     Button(clickUp.isConnected ? "Verificar novo token" : "Verificar e conectar") {
                         let submitted = personalToken
